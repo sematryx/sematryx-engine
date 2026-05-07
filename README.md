@@ -40,3 +40,6 @@ result = optimize(
 print(result.best_value)
 ```
 
+
+
+
