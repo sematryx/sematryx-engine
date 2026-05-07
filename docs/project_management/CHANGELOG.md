@@ -13,3 +13,5 @@
 - Defined Stage 2 plan for quality-to-release readiness with concrete PR slices.
 - Added Stage 2 benchmark suite with reproducible domain scenarios and `make benchmark`.
 - Enabled strict policy mode requiring new PRD/VR files per source slice and new ADRs for core behavior changes.
+- Added Stage 2 explainability follow-up track with slice-level roadmap and acceptance criteria.
+- Added Stage 4 preview for full core-depth parity including topology-to-solver integration.
