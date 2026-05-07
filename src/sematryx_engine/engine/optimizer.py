@@ -9,7 +9,10 @@ from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
 from sematryx_engine.solvers.scipy_solvers import solve_with_scipy
 
 _MEMORY = LocalStrategyMemory(Path.home() / ".sematryx" / "strategy_memory.db")
-_SELECTOR = StrategySelector(memory=_MEMORY)
+_SELECTOR = StrategySelector(
+    memory=_MEMORY,
+    bandit_state_path=Path.home() / ".sematryx" / "bandit_state.json",
+)
 
 
 def run_optimization(

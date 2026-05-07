@@ -8,3 +8,10 @@
 - [ ] INTEGRATION_DEBT updated
 - [ ] Branch protection and required checks enabled
 - [ ] Rollback plan documented in PR
+
+## Branch Protection Verification Notes
+
+- Protected branch: `main`
+- Required status check: `CI / test`
+- Pull requests required before merge
+- Force pushes and branch deletion disabled

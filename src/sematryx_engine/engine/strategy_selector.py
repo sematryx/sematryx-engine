@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from sematryx_engine.engine.problem_features import ProblemFeatures
 from sematryx_engine.learning.bandit import StrategyBandit
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
@@ -10,11 +12,20 @@ STRATEGIES = [
 
 
 class StrategySelector:
-    def __init__(self, memory: LocalStrategyMemory) -> None:
-        self._bandit = StrategyBandit(STRATEGIES)
+    def __init__(
+        self,
+        memory: LocalStrategyMemory,
+        bandit_state_path: Path | None = None,
+    ) -> None:
+        self._bandit = StrategyBandit(STRATEGIES, state_path=bandit_state_path)
         self._memory = memory
 
-    def select(self, features: ProblemFeatures, domain: str) -> tuple[str, float]:
+    def select(
+        self,
+        features: ProblemFeatures,
+        domain: str,
+        deterministic_bandit: bool = False,
+    ) -> tuple[str, float]:
         # Keep strategy filtering deterministic and simple in v1.
         if features.dimensions > 12:
             candidates = ["scipy_de", "scipy_dual_annealing"]
@@ -35,7 +46,7 @@ class StrategySelector:
             if rec.strategy_name in STRATEGIES and rec.strategy_name not in candidates:
                 candidates.append(rec.strategy_name)
 
-        return self._bandit.select(candidates)
+        return self._bandit.select(candidates, deterministic=deterministic_bandit)
 
     def update(self, strategy_name: str, reward: float) -> None:
         self._bandit.update(strategy_name, reward)

@@ -8,6 +8,7 @@ flowchart LR
     OPT --> SEL[Strategy Selector]
     SEL --> MEM[(Local Strategy Memory SQLite)]
     SEL --> BANDIT[Contextual Bandit]
+    BANDIT --> BANDIT_STATE[(Bandit State JSON)]
     OPT --> SOLV[SciPy Solvers]
     SOLV --> RES[Optimization Result]
     OPT --> MEM

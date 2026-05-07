@@ -18,8 +18,18 @@ This repository follows a rigid, enforced workflow.
 
 - Pre-commit hooks run lint, typing, tests, and policy checks.
 - Policy scripts block merges when required artifacts are missing.
+- CI runs `check_release_checklist.py` to prevent release checklist drift.
 - Forbidden imports are blocked for cloud/platform packages in local-first core.
 - PRD and verification artifacts are mandatory for source-code changes.
+
+## Branch Protection Verification
+
+Before relying on guardrails, confirm GitHub branch protection for `main` includes:
+
+- Require a pull request before merging
+- Require status checks to pass with `CI / test`
+- Require branches to be up to date before merging
+- Block force pushes and deletions
 
 ## Local Commands
 

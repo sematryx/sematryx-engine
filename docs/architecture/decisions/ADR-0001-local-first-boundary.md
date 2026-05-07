@@ -34,3 +34,6 @@ Enforcement mechanisms:
 Selection policy includes a local-memory deterministic override when a strategy has
 at least three domain runs, to reduce cold-start variance and make empirical learning
 effects directly testable in integration tests.
+
+Bandit posterior state is also persisted locally in JSON between process restarts to
+preserve online learning while maintaining a strict no-cloud default boundary.

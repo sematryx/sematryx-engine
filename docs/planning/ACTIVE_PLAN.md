@@ -6,13 +6,13 @@ Phase 3-4: local learning hardening and process enforcement.
 
 ## Next 3 Slices
 
-1. Persist and validate stronger bandit context/reward behavior
-2. Expand integration tests for strategy quality over repeated runs
-3. Add release checklist automation and branch-protection verification notes
+1. Add domain-focused benchmark scenarios for confidence calibration
+2. Add lightweight report generation for learning quality trends
+3. Add PR status-check naming docs for multi-job CI growth
 
 ## Blockers
 
-- Branch protection setup in GitHub still needs to be finalized.
+- None.
 
 ## Last Updated
 

@@ -52,3 +52,6 @@ Enable branch protection after first CI pass on GitHub.
 
 Expanded workflow enforcement with architecture overview, active plan, changelog,
 integration debt tracking, and stricter policy gates.
+
+Completed persistence of bandit state across restarts and added deterministic
+integration evidence that warmed local learning influences subsequent selection.
