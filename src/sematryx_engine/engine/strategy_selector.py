@@ -23,8 +23,14 @@ class StrategySelector:
         else:
             candidates = list(STRATEGIES)
 
-        # Domain recommendations influence candidate order but stay non-blocking.
+        # Domain recommendations can override cold-start when evidence is strong.
         recommendations = self._memory.get_strategy_recommendations(domain=domain, limit=2)
+        if recommendations:
+            top = recommendations[0]
+            # Use deterministic memory override only with enough historical evidence.
+            if top.usage_count >= 3:
+                return top.strategy_name, 0.9
+
         for rec in recommendations:
             if rec.strategy_name in STRATEGIES and rec.strategy_name not in candidates:
                 candidates.append(rec.strategy_name)

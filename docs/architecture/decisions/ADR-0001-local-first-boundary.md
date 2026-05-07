@@ -28,3 +28,9 @@ Enforcement mechanisms:
 - Positive: stable boundaries, faster tests, lower operational complexity
 - Negative: adapter work required for optional integrations later
 - Follow-up tasks: add CI workflow enforcement and branch protection in GitHub settings
+
+## Amendment (2026-05-07)
+
+Selection policy includes a local-memory deterministic override when a strategy has
+at least three domain runs, to reduce cold-start variance and make empirical learning
+effects directly testable in integration tests.

@@ -14,6 +14,11 @@ Local-first optimization engine package for Sematryx.
 This repository uses enforced policy checks, ADR requirements for architecture changes,
 and forbidden-import checks to keep a strict local-first boundary.
 
+Learning behavior includes a deterministic memory override when enough local evidence
+exists for a domain strategy, with bandit selection remaining the default path.
+
+The repo additionally enforces planning and verification artifacts to reduce drift.
+
 ## Quick Start
 
 ```bash

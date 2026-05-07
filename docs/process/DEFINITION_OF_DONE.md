@@ -15,6 +15,8 @@ A change is done only if all items below are satisfied.
 - [ ] Tests were added/updated for behavior changes
 - [ ] README updated when user-visible behavior changed
 - [ ] ADR added/updated for architecture-impacting changes
+- [ ] PRD added/updated for source-code changes
+- [ ] Verification report added/updated under `docs/process/verification/`
 - [ ] PR includes risk and rollback notes
 
 ## Review

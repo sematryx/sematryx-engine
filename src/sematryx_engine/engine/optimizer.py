@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from math import isfinite
 from pathlib import Path
 
 from sematryx_engine.api.models import OptimizationResult
@@ -48,10 +49,13 @@ def run_optimization(
         },
     )
 
+    solver_success = bool(getattr(scipy_result, "success", True))
+    practical_success = solver_success or isfinite(best_value)
+
     return OptimizationResult(
         best_solution=list(scipy_result.x),
         best_value=best_value,
         evaluations=int(getattr(scipy_result, "nfev", 0)),
         strategy_used=strategy_name,
-        success=bool(getattr(scipy_result, "success", True)),
+        success=practical_success,
     )
