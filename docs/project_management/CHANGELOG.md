@@ -12,3 +12,4 @@
 - Replaced CI template with executable workflow and added release-checklist policy check.
 - Defined Stage 2 plan for quality-to-release readiness with concrete PR slices.
 - Added Stage 2 benchmark suite with reproducible domain scenarios and `make benchmark`.
+- Enabled strict policy mode requiring new PRD/VR files per source slice and new ADRs for core behavior changes.

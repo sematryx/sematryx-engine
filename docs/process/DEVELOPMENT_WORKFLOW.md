@@ -21,6 +21,8 @@ This repository follows a rigid, enforced workflow.
 - CI runs `check_release_checklist.py` to prevent release checklist drift.
 - Forbidden imports are blocked for cloud/platform packages in local-first core.
 - PRD and verification artifacts are mandatory for source-code changes.
+- Strict mode: source changes must include NEW `PRD-*.md` and NEW `VR-*.md` files.
+- Strict mode: changes under engine/learning/solvers must include a NEW ADR file.
 
 ## Branch Protection Verification
 
