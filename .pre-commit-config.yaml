@@ -1,0 +1,27 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.12
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.18.2
+    hooks:
+      - id: mypy
+        args: ["src"]
+
+  - repo: local
+    hooks:
+      - id: pytest-unit-smoke
+        name: pytest unit and smoke
+        entry: .venv311/bin/python -m pytest tests/unit tests/smoke
+        language: system
+        pass_filenames: false
+
+      - id: policy-check
+        name: repository policy checks
+        entry: .venv311/bin/python scripts/check_policy.py
+        language: system
+        pass_filenames: false

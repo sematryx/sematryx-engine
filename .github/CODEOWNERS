@@ -1,0 +1,9 @@
+# Default owner for all paths
+* @patrick
+
+# Architecture and policy changes should always be reviewed carefully
+docs/architecture/* @patrick
+docs/architecture/decisions/* @patrick
+scripts/check_policy.py @patrick
+scripts/check_forbidden_imports.py @patrick
+.github/workflows/* @patrick
