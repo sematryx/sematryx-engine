@@ -15,3 +15,5 @@
 - Enabled strict policy mode requiring new PRD/VR files per source slice and new ADRs for core behavior changes.
 - Added Stage 2 explainability follow-up track with slice-level roadmap and acceptance criteria.
 - Added Stage 4 preview for full core-depth parity including topology-to-solver integration.
+- Added enforceable Adoption Gate workflow and policy checks for new subsystem integrations.
+- Reordered execution sequence to complete benchmark-depth slices before Stage 4, with Stage 3 deferred until after Stage 4 parity.

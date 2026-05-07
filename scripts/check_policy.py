@@ -7,6 +7,7 @@ REQUIRED_FILES = [
     Path("docs/architecture/SYSTEM_OVERVIEW.md"),
     Path("docs/process/DEFINITION_OF_DONE.md"),
     Path("docs/process/DEVELOPMENT_WORKFLOW.md"),
+    Path("docs/process/ADOPTION_GATE.md"),
     Path("docs/process/INCIDENT_RESPONSE.md"),
     Path("docs/process/OWNERSHIP.md"),
     Path("docs/process/RELEASE_CHECKLIST.md"),
@@ -18,6 +19,8 @@ REQUIRED_FILES = [
     Path("docs/project_management/CHANGELOG.md"),
     Path("docs/project_management/INTEGRATION_DEBT.md"),
 ]
+
+KNOWN_SUBSYSTEM_DIRS = {"api", "engine", "learning", "solvers"}
 
 
 def _changed_files() -> list[str]:
@@ -82,6 +85,24 @@ def _added_files() -> set[str]:
     return added
 
 
+def _new_subsystem_dirs(added_files: set[str]) -> set[str]:
+    new_dirs: set[str] = set()
+    prefix = "src/sematryx_engine/"
+    for path in added_files:
+        if not path.startswith(prefix):
+            continue
+        remainder = path[len(prefix) :]
+        if "/" not in remainder:
+            continue
+        top_dir = remainder.split("/", 1)[0]
+        if top_dir in KNOWN_SUBSYSTEM_DIRS:
+            continue
+        if top_dir.startswith("__"):
+            continue
+        new_dirs.add(top_dir)
+    return new_dirs
+
+
 def main() -> int:
     errors: list[str] = []
 
@@ -143,6 +164,8 @@ def main() -> int:
     active_plan_changed = "docs/planning/ACTIVE_PLAN.md" in changed_set
     changelog_changed = "docs/project_management/CHANGELOG.md" in changed_set
     debt_changed = "docs/project_management/INTEGRATION_DEBT.md" in changed_set
+    adoption_gate_changed = "docs/process/ADOPTION_GATE.md" in changed_set
+    new_subsystems = _new_subsystem_dirs(added_set)
 
     if architecture_changed and not adr_changed:
         errors.append(
@@ -195,6 +218,12 @@ def main() -> int:
         errors.append(
             "Strict mode: Core behavior changed under engine/learning/solvers, "
             "but no NEW ADR file was added."
+        )
+    if new_subsystems and not adoption_gate_changed:
+        errors.append(
+            "Strict mode: New subsystem directories were added under src/sematryx_engine "
+            f"({', '.join(sorted(new_subsystems))}), but docs/process/ADOPTION_GATE.md "
+            "was not updated with trial evidence."
         )
 
     # PRD completion quality gate
