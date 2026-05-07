@@ -7,6 +7,7 @@ REQUIRED_FILES = [
     Path("docs/architecture/SYSTEM_OVERVIEW.md"),
     Path("docs/process/DEFINITION_OF_DONE.md"),
     Path("docs/process/DEVELOPMENT_WORKFLOW.md"),
+    Path("docs/process/ADOPTION_GATE.md"),
     Path("docs/process/INCIDENT_RESPONSE.md"),
     Path("docs/process/OWNERSHIP.md"),
     Path("docs/process/RELEASE_CHECKLIST.md"),
@@ -18,6 +19,8 @@ REQUIRED_FILES = [
     Path("docs/project_management/CHANGELOG.md"),
     Path("docs/project_management/INTEGRATION_DEBT.md"),
 ]
+
+KNOWN_SUBSYSTEM_DIRS = {"api", "engine", "learning", "solvers"}
 
 
 def _changed_files() -> list[str]:
@@ -44,6 +47,62 @@ def _changed_files() -> list[str]:
     return sorted(changed)
 
 
+def _added_files() -> set[str]:
+    diff_commands = [
+        ["git", "diff", "--name-status", "origin/main...HEAD"],
+        ["git", "diff", "--name-status", "HEAD~1...HEAD"],
+        ["git", "diff", "--name-status"],
+        ["git", "diff", "--name-status", "--cached"],
+    ]
+    added: set[str] = set()
+    for cmd in diff_commands:
+        try:
+            output = subprocess.check_output(
+                cmd, text=True, stderr=subprocess.DEVNULL
+            ).strip()
+        except Exception:
+            continue
+        if not output:
+            continue
+        for line in output.splitlines():
+            parts = line.split("\t")
+            if len(parts) < 2:
+                continue
+            status, path = parts[0], parts[-1].strip()
+            if status.startswith("A") and path:
+                added.add(path)
+    try:
+        untracked = subprocess.check_output(
+            ["git", "ls-files", "--others", "--exclude-standard"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+        for line in untracked.splitlines():
+            if line.strip():
+                added.add(line.strip())
+    except Exception:
+        pass
+    return added
+
+
+def _new_subsystem_dirs(added_files: set[str]) -> set[str]:
+    new_dirs: set[str] = set()
+    prefix = "src/sematryx_engine/"
+    for path in added_files:
+        if not path.startswith(prefix):
+            continue
+        remainder = path[len(prefix) :]
+        if "/" not in remainder:
+            continue
+        top_dir = remainder.split("/", 1)[0]
+        if top_dir in KNOWN_SUBSYSTEM_DIRS:
+            continue
+        if top_dir.startswith("__"):
+            continue
+        new_dirs.add(top_dir)
+    return new_dirs
+
+
 def main() -> int:
     errors: list[str] = []
 
@@ -53,8 +112,15 @@ def main() -> int:
 
     changed = _changed_files()
     changed_set = set(changed)
+    added_set = _added_files()
     architecture_changed = any(
         p.startswith("src/sematryx_engine/engine/")
+        or p.startswith("src/sematryx_engine/solvers/")
+        for p in changed
+    )
+    core_behavior_changed = any(
+        p.startswith("src/sematryx_engine/engine/")
+        or p.startswith("src/sematryx_engine/learning/")
         or p.startswith("src/sematryx_engine/solvers/")
         for p in changed
     )
@@ -80,10 +146,26 @@ def main() -> int:
         p.startswith("docs/architecture/decisions/") and p != "docs/architecture/decisions/README.md"
         for p in changed
     )
+    adr_added = any(
+        p.startswith("docs/architecture/decisions/")
+        and p != "docs/architecture/decisions/README.md"
+        for p in added_set
+    )
+    prd_added = any(
+        p.startswith("docs/prd/") and p != "docs/prd/PRD-template.md"
+        for p in added_set
+    )
+    verification_added = any(
+        p.startswith("docs/process/verification/")
+        and p != "docs/process/verification/IMPLEMENTATION_VERIFICATION_TEMPLATE.md"
+        for p in added_set
+    )
     diagram_changed = "docs/architecture/SYSTEM_OVERVIEW.md" in changed_set
     active_plan_changed = "docs/planning/ACTIVE_PLAN.md" in changed_set
     changelog_changed = "docs/project_management/CHANGELOG.md" in changed_set
     debt_changed = "docs/project_management/INTEGRATION_DEBT.md" in changed_set
+    adoption_gate_changed = "docs/process/ADOPTION_GATE.md" in changed_set
+    new_subsystems = _new_subsystem_dirs(added_set)
 
     if architecture_changed and not adr_changed:
         errors.append(
@@ -106,10 +188,16 @@ def main() -> int:
         )
     if code_changed and not prd_changed:
         errors.append("Code changed under src/, but no PRD was updated/added under docs/prd/.")
+    if code_changed and not prd_added:
+        errors.append("Strict mode: Code changed under src/, but no NEW PRD file was added.")
     if code_changed and not verification_changed:
         errors.append(
             "Code changed under src/, but no verification report was updated/added under "
             "docs/process/verification/."
+        )
+    if code_changed and not verification_added:
+        errors.append(
+            "Strict mode: Code changed under src/, but no NEW verification report file was added."
         )
     if code_changed and not active_plan_changed:
         errors.append(
@@ -126,6 +214,17 @@ def main() -> int:
 
     if "README.md" not in changed_set and code_changed:
         errors.append("Code changed under src/, but README.md was not updated.")
+    if core_behavior_changed and not adr_added:
+        errors.append(
+            "Strict mode: Core behavior changed under engine/learning/solvers, "
+            "but no NEW ADR file was added."
+        )
+    if new_subsystems and not adoption_gate_changed:
+        errors.append(
+            "Strict mode: New subsystem directories were added under src/sematryx_engine "
+            f"({', '.join(sorted(new_subsystems))}), but docs/process/ADOPTION_GATE.md "
+            "was not updated with trial evidence."
+        )
 
     # PRD completion quality gate
     for path in changed:
