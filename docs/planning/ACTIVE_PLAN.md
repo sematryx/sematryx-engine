@@ -25,6 +25,28 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 
 4. Benchmark evolution slice: add objective-level quality metrics beyond strategy hit-rate.
 
+## Stage 3 Preview: Discrete Optimizers
+
+### Stage Goal
+
+Add first-class support for integer and categorical decision variables while preserving
+the same local-first learning loop and policy enforcement model.
+
+### Candidate Slices
+
+1. Problem model slice: add typed variable descriptors (`continuous`, `integer`, `categorical`).
+2. Solver slice: add baseline discrete solvers (random search + local neighborhood search).
+3. Hybrid routing slice: route mixed-variable problems to compatible solver pipelines.
+4. Learning slice: capture discrete-problem features and strategy rewards in local memory.
+5. Validation slice: add benchmark scenarios for integer knapsack-like and scheduling-like cases.
+
+### Stage Acceptance Criteria
+
+1. API supports mixed-variable bounds/specs with clear validation errors.
+2. At least two discrete-capable strategies are available in the runtime path.
+3. Strategy selection quality improves from cold to warm history on discrete benchmarks.
+4. Docs and verification artifacts are added for each slice (PRD + verification report).
+
 ## Blockers
 
 - None.
