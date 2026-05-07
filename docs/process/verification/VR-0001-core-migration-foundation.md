@@ -37,3 +37,6 @@ None.
 
 Validated added governance artifacts and stricter policy script gates for planning,
 verification, architecture overview freshness, and integration-test requirements.
+
+Validated persisted bandit state and restart continuity with deterministic selection
+checks in `tests/integration/test_bandit_state_persistence.py`.

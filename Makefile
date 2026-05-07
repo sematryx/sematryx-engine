@@ -18,5 +18,6 @@ smoke:
 policy:
 	.venv311/bin/python scripts/check_forbidden_imports.py
 	.venv311/bin/python scripts/check_policy.py
+	.venv311/bin/python scripts/check_release_checklist.py
 
 all: lint typecheck test policy
