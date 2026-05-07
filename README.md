@@ -29,6 +29,11 @@ pip install -e .[dev]
 pytest
 ```
 
+```bash
+# Stage 2 benchmark suite
+make benchmark
+```
+
 ```python
 from sematryx_engine import optimize
 

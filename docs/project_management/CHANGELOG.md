@@ -10,3 +10,5 @@
 - Added deterministic warm-state integration coverage for selector behavior.
 - Added repeated-run integration coverage for cold vs warm domain selection quality.
 - Replaced CI template with executable workflow and added release-checklist policy check.
+- Defined Stage 2 plan for quality-to-release readiness with concrete PR slices.
+- Added Stage 2 benchmark suite with reproducible domain scenarios and `make benchmark`.
