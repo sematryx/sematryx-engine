@@ -1,4 +1,4 @@
-.PHONY: install lint typecheck test smoke policy all
+.PHONY: install lint typecheck test smoke benchmark policy all
 
 install:
 	.venv311/bin/python -m pip install -e ".[dev]"
@@ -14,6 +14,9 @@ test:
 
 smoke:
 	.venv311/bin/python -m pytest tests/smoke
+
+benchmark:
+	.venv311/bin/python -m pytest tests/performance
 
 policy:
 	.venv311/bin/python scripts/check_forbidden_imports.py
