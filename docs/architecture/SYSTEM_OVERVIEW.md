@@ -19,6 +19,7 @@ flowchart LR
     GEN[Benchmark report CLI] --> BMET[benchmark_metrics]
     BMET -. selection scenarios .-> SEL
     BMET -. objective snapshots .-> SOLV
+    VAL[Core-depth validation tests] -. regression gates .-> OPT
 ```
 
 ## Boundaries
@@ -35,3 +36,4 @@ flowchart LR
 - Optimizer can execute bounded topology-budgeted retries and return per-attempt rationale in explanations.
 - Deterministic tuning priors scale SciPy budgets/settings before each attempt and are echoed in explanations.
 - Explanations include adaptation overlays referencing topology/problem summaries plus retry winners.
+- Core-depth validation tests gate benchmark thresholds and runtime contract parity fields.

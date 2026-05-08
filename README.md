@@ -36,6 +36,8 @@ Solver hyperparameter priors are computed deterministically from domain label, p
 and topology regime and are reflected in explanations alongside per-attempt evaluation budgets.
 Explanations additionally expose an adaptation overlay tying topology hints, problem feature summaries,
 retry sequencing, and the winning attempt index.
+A parity-oriented integration regression gate validates benchmark snapshot thresholds and
+runtime contract completeness across topology + adaptation + tuning-prior surfaces.
 
 The repo additionally enforces planning and verification artifacts to reduce drift.
 
