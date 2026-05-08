@@ -2,6 +2,8 @@
 
 ## 2026-05-08
 
+- Documented execution order: legacy continuous solver roster in Stage 4 before Stage 3 discrete; added Stage 4 slice and acceptance criterion for portfolio parity.
+- Split CI into parallel jobs (`lint`, `typecheck`, `unit-smoke`, `policy`) with aggregate `required-checks` gate; updated release and workflow docs for branch protection naming.
 - Extended domain benchmark snapshot to version 2 with isolated sphere objective runs (`objectives` section).
 - Added performance coverage for objective benchmark thresholds and integration asserts aligned with the snapshot contract.
 - Benchmark trend Markdown report includes an objective-quality table when objectives are present.
