@@ -13,7 +13,7 @@ flowchart LR
     OPT --> SOLV[SciPy Solvers]
     SOLV --> RES[Optimization Result]
     OPT --> MEM
-    RES --> EXP[Explanation Metadata]
+    RES --> EXP[Structured Explanation Metadata]
     GEN[Benchmark report CLI] --> BMET[benchmark_metrics]
     BMET -. selection scenarios .-> SEL
     BMET -. objective snapshots .-> SOLV
@@ -28,3 +28,4 @@ flowchart LR
 - Offline benchmark snapshots use `benchmark_metrics` and the report CLI without affecting live optimize paths.
 - Snapshot version 2 adds reproducible objective-quality rows (isolated memory/bandit paths + scipy solve).
 - Stage 4 topology integration consumes Physarum signal to inform tunneling-oriented strategy routing.
+- Result payload includes structured explanation schema (basis/confidence + topology evidence).

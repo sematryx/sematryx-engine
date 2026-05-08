@@ -26,6 +26,8 @@ Each optimization result now includes a deterministic `topology_artifact` scaffo
 (dimensions, span profile, budget regime, complexity hint) for Stage 4 topology integration.
 The topology artifact now includes Physarum tunneling guidance and can directly influence
 strategy selection for aggressive tunneling cases.
+Optimization results also include a structured `explanation` payload describing selection basis,
+confidence, and topology-tunneling evidence.
 
 The repo additionally enforces planning and verification artifacts to reduce drift.
 

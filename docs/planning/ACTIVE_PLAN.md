@@ -17,9 +17,9 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 
 ## Next 3 Slices
 
-1. Explanation schema slice (explainability track): structured explanation payload on the result model.
-2. Legacy continuous solver roster slice (Stage 4): registry, optional deps, benchmarks (see Stage 4 preview).
-3. Autodidactic loop slice (Stage 4): bounded multi-attempt adaptive retry workflow.
+1. Legacy continuous solver roster slice (Stage 4): registry, optional deps, benchmarks (see Stage 4 preview).
+2. Autodidactic loop slice (Stage 4): bounded multi-attempt adaptive retry workflow.
+3. Hyperparameter tuning slice (Stage 4): local tuning priors per domain/problem features.
 
 ## Stage 2 Follow-up: Explainability Components
 

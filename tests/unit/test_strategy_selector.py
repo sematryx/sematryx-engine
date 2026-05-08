@@ -64,7 +64,7 @@ def test_selector_prefers_tunneling_when_physarum_signal_is_aggressive(tmp_path:
     selector = StrategySelector(memory=memory)
     features = extract_problem_features(bounds=[(-8.0, 8.0)] * 6, max_evaluations=120)
 
-    strategy, confidence = selector.select(
+    strategy, confidence, basis = selector.select_with_basis(
         features=features,
         domain="general",
         topology_artifact={
@@ -75,3 +75,4 @@ def test_selector_prefers_tunneling_when_physarum_signal_is_aggressive(tmp_path:
 
     assert strategy == "scipy_dual_annealing"
     assert confidence == 0.86
+    assert basis == "physarum_tunneling_override"

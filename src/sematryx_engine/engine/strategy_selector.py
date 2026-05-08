@@ -54,6 +54,22 @@ class StrategySelector:
         topology_artifact: dict[str, object] | None = None,
         deterministic_bandit: bool = False,
     ) -> tuple[str, float]:
+        strategy, confidence, _basis = self.select_with_basis(
+            features=features,
+            domain=domain,
+            topology_artifact=topology_artifact,
+            deterministic_bandit=deterministic_bandit,
+        )
+        return strategy, confidence
+
+    def select_with_basis(
+        self,
+        *,
+        features: ProblemFeatures,
+        domain: str,
+        topology_artifact: dict[str, object] | None = None,
+        deterministic_bandit: bool = False,
+    ) -> tuple[str, float, str]:
         # Keep strategy filtering deterministic and simple in v1.
         if features.dimensions > 12:
             candidates = ["scipy_de", "scipy_dual_annealing"]
@@ -68,17 +84,19 @@ class StrategySelector:
             top = recommendations[0]
             # Use deterministic memory override only with enough historical evidence.
             if top.usage_count >= 3:
-                return top.strategy_name, memory_override_confidence(top.usage_count)
+                return top.strategy_name, memory_override_confidence(top.usage_count), "memory_override"
 
         tunneling_choice = _topology_tunneling_override(topology_artifact)
         if tunneling_choice is not None:
-            return tunneling_choice
+            strategy, confidence = tunneling_choice
+            return strategy, confidence, "physarum_tunneling_override"
 
         for rec in recommendations:
             if rec.strategy_name in STRATEGIES and rec.strategy_name not in candidates:
                 candidates.append(rec.strategy_name)
 
-        return self._bandit.select(candidates, deterministic=deterministic_bandit)
+        strategy, confidence = self._bandit.select(candidates, deterministic=deterministic_bandit)
+        return strategy, confidence, "bandit"
 
     def update(self, strategy_name: str, reward: float) -> None:
         self._bandit.update(strategy_name, reward)

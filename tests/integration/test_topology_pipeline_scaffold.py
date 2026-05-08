@@ -23,3 +23,10 @@ def test_optimize_includes_topology_artifact() -> None:
     assert artifact["budget_regime"] == "tight"
     assert artifact["complexity_hint"] in {"low", "medium", "high"}
     assert artifact["tunneling_directive"] in {"local", "balanced", "aggressive"}
+    assert result.explanation is not None
+    assert result.explanation["strategy_used"] == result.strategy_used
+    assert result.explanation["selection_basis"] in {
+        "bandit",
+        "memory_override",
+        "physarum_tunneling_override",
+    }
