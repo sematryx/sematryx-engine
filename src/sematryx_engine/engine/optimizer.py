@@ -78,6 +78,7 @@ def run_optimization(
 
     best_result = None
     best_strategy = strategy_name
+    winning_attempt_index = 1
     attempt_records: list[dict[str, object]] = []
     for idx, attempt_strategy in enumerate(attempt_plan, start=1):
         effective_budget = max(
@@ -105,6 +106,7 @@ def run_optimization(
         if best_result is None or value < float(best_result.fun):
             best_result = scipy_result
             best_strategy = attempt_strategy
+            winning_attempt_index = idx
 
     assert best_result is not None
     scipy_result = best_result
@@ -151,5 +153,15 @@ def run_optimization(
             "attempt_limit": attempt_limit,
             "attempts": attempt_records,
             "tuning_priors": tuning_priors,
+            "adaptation": {
+                "topology_budget_regime": topology_artifact.budget_regime,
+                "topology_complexity_hint": topology_artifact.complexity_hint,
+                "problem_complexity": features.complexity,
+                "problem_dimensions": features.dimensions,
+                "problem_budget_per_dimension": features.budget_per_dimension,
+                "global_evaluation_budget": max_evaluations,
+                "planned_strategies": list(attempt_plan),
+                "winning_attempt": winning_attempt_index,
+            },
         },
     )

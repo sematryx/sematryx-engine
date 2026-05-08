@@ -11,6 +11,7 @@
 - `ADR-0008-legacy-continuous-solver-roster.md` - Expanded SciPy-first continuous strategy roster
 - `ADR-0009-autodidactic-bounded-loop.md` - Topology-budgeted bounded retry loop in optimizer
 - `ADR-0010-local-hyperparameter-priors.md` - Deterministic solver tuning priors from domain/topology
+- `ADR-0011-explainability-adaptation-depth.md` - Adaptation overlay fields inside explanations
 
 Add ADR files here using a monotonic sequence, for example:
 
@@ -24,3 +25,4 @@ Add ADR files here using a monotonic sequence, for example:
 - `ADR-0008-legacy-continuous-solver-roster.md`
 - `ADR-0009-autodidactic-bounded-loop.md`
 - `ADR-0010-local-hyperparameter-priors.md`
+- `ADR-0011-explainability-adaptation-depth.md`
