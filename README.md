@@ -39,6 +39,8 @@ make benchmark
 make report-benchmark
 ```
 
+Snapshots include selection scenarios plus isolated scipy sphere runs (`version` 2, `objectives` section).
+
 ```python
 from sematryx_engine import optimize
 

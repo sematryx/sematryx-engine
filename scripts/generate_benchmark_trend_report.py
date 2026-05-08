@@ -44,6 +44,36 @@ def _render_markdown(payload: dict[str, object], generated_at: str) -> str:
                 )
                 + " |"
             )
+
+    objectives = payload.get("objectives")
+    if isinstance(objectives, dict) and objectives:
+        lines.extend(
+            [
+                "",
+                "## Objective quality",
+                "",
+                "| Scenario | Best value | Evaluations | Strategy | Dimensions |",
+                "|-----------|------------|-------------|----------|------------|",
+            ]
+        )
+        for key in ("sphere_dim4", "sphere_dim8"):
+            row = objectives.get(key)
+            if not isinstance(row, dict):
+                continue
+            lines.append(
+                "| "
+                + " | ".join(
+                    [
+                        str(row.get("scenario_name", key)),
+                        f"{float(row.get('best_value', 0)):.6f}",
+                        str(row.get("evaluations", "")),
+                        str(row.get("strategy_used", "")),
+                        str(row.get("dimensions", "")),
+                    ]
+                )
+                + " |"
+            )
+
     lines.extend(
         [
             "",
@@ -51,6 +81,7 @@ def _render_markdown(payload: dict[str, object], generated_at: str) -> str:
             "",
             "- Cold rows reflect strategy selection without domain memory.",
             "- Warm rows reflect selection after repeated stored successes for the target strategy.",
+            "- Objective rows summarize isolated scipy runs on sphere objectives.",
             "",
         ]
     )

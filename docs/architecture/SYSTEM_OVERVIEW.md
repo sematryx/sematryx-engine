@@ -14,7 +14,8 @@ flowchart LR
     OPT --> MEM
     RES --> EXP[Explanation Metadata]
     GEN[Benchmark report CLI] --> BMET[benchmark_metrics]
-    BMET -. offline .-> SEL
+    BMET -. selection scenarios .-> SEL
+    BMET -. objective snapshots .-> SOLV
 ```
 
 ## Boundaries
@@ -24,3 +25,4 @@ flowchart LR
 - Integrations beyond local runtime must be optional adapters.
 - Reported selection confidence reflects posterior belief or evidence-scaled memory override.
 - Offline benchmark snapshots use `benchmark_metrics` and the report CLI without affecting live optimize paths.
+- Snapshot version 2 adds reproducible objective-quality rows (isolated memory/bandit paths + scipy solve).
