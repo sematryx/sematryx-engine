@@ -40,6 +40,7 @@ A parity-oriented integration regression gate validates benchmark snapshot thres
 runtime contract completeness across topology + adaptation + tuning-prior surfaces.
 Optional non-SciPy continuous backends (CMA-ES and scikit-optimize families) are wired behind
 runtime availability checks so default installs remain lightweight.
+Concise and verbose explanation formatter helpers are exported for quick human-readable summaries.
 
 The repo additionally enforces planning and verification artifacts to reduce drift.
 

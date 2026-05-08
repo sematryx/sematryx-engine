@@ -2,6 +2,7 @@
 
 ## 2026-05-08
 
+- Added explanation formatter helpers (concise + verbose) for structured explanation payloads and exported them in the package API.
 - Added optional non-SciPy continuous backend wiring (CMA-ES + scikit-optimize families) behind runtime availability detection and strategy dispatch.
 - Added core-depth parity regression gate test covering snapshot thresholds and full runtime contract surface (topology, adaptation, priors, attempts).
 - Extended explanations with adaptation depth (topology/problem summaries, planned retries, winning attempt index).

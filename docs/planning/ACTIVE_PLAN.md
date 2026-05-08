@@ -17,9 +17,9 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 
 ## Next 3 Slices
 
-1. Non-SciPy continuous backends slice (Stage 4): optional CMA-ES and scikit-optimize wiring behind extras.
-2. Explanation formatter slice (explainability track): concise rendering helpers from structured payloads.
-3. Stage 3 kickoff slice: typed variable descriptors for continuous/integer/categorical problems.
+1. Stage 3 kickoff slice: typed variable descriptors for continuous/integer/categorical problems.
+2. Stage 3 solver baseline slice: random-search and neighborhood discrete strategies.
+3. Stage 3 hybrid routing slice: mixed-variable routing and validation gates.
 
 ## Stage 2 Follow-up: Explainability Components
 
