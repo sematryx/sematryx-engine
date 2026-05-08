@@ -17,13 +17,9 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 
 ## Next 3 Slices
 
-1. Calibration slice: tune selection confidence/reward behavior and lock with tests.
-2. Benchmark evolution slice: add objective-level quality metrics beyond strategy hit-rate.
-3. Release-hardening docs slice: status-check naming and multi-job CI branch-rule guidance.
-
-## Planned Follow-up Slices
-
-4. Stage 4 kickoff slice: topology pipeline scaffolding and baseline integration tests.
+1. Benchmark evolution slice: add objective-level quality metrics beyond strategy hit-rate.
+2. Release-hardening docs slice: status-check naming and multi-job CI branch-rule guidance.
+3. Stage 4 kickoff slice: topology pipeline scaffolding and baseline integration tests.
 
 ## Stage 2 Follow-up: Explainability Components
 
@@ -49,8 +45,8 @@ understand "why this path was chosen" and compare behavior across cold vs warm r
 
 ## Execution Order Gate
 
-Stage 4 begins only after Stage 2 benchmark-depth slices are complete (reporting,
-calibration, and objective-level benchmark evolution). Stage 3 discrete optimizers begin
+Stage 4 begins only after Stage 2 benchmark-depth slices are complete: reporting (done),
+calibration (done), and objective-level benchmark evolution. Stage 3 discrete optimizers begin
 after Stage 4 core-depth parity slices have established stable topology-driven routing and
 adaptive loops.
 

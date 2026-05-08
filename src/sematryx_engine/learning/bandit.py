@@ -28,8 +28,9 @@ class StrategyBandit:
         for name in candidate_names:
             state = self._arms[name]
             draws.append((name, random.betavariate(state.alpha, state.beta)))
-        selected = max(draws, key=lambda item: item[1])
-        return selected
+        selected_name, _ = max(draws, key=lambda item: item[1])
+        # Report posterior mean of the chosen arm (not the Thompson draw) as confidence.
+        return selected_name, self.posterior_mean(selected_name)
 
     def update(self, strategy_name: str, reward: float) -> None:
         state = self._arms[strategy_name]

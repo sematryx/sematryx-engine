@@ -22,4 +22,5 @@ flowchart LR
 - Local-first runtime: no required cloud dependencies in core path.
 - Strategy memory and learning are persisted locally.
 - Integrations beyond local runtime must be optional adapters.
+- Reported selection confidence reflects posterior belief or evidence-scaled memory override.
 - Offline benchmark snapshots use `benchmark_metrics` and the report CLI without affecting live optimize paths.

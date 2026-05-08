@@ -20,6 +20,8 @@ exists for a domain strategy, with bandit selection remaining the default path.
 Bandit learning state is persisted locally at `~/.sematryx/bandit_state.json` so
 selection quality can improve across process restarts.
 
+Bandit rewards from each run use `min(1, 1/(1+sqrt(best_value)))` for smoother updates across objective scales.
+
 The repo additionally enforces planning and verification artifacts to reduce drift.
 
 ## Quick Start
