@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-05-08
+
+- Extended domain benchmark snapshot to version 2 with isolated sphere objective runs (`objectives` section).
+- Added performance coverage for objective benchmark thresholds and integration asserts aligned with the snapshot contract.
+- Benchmark trend Markdown report includes an objective-quality table when objectives are present.
+
 ## 2026-05-07
 
 - Bootstrapped `sematryx-engine` local-first package scaffold.
