@@ -28,6 +28,8 @@ The topology artifact now includes Physarum tunneling guidance and can directly 
 strategy selection for aggressive tunneling cases.
 Optimization results also include a structured `explanation` payload describing selection basis,
 confidence, and topology-tunneling evidence.
+The continuous strategy roster now includes additional SciPy methods (`shgo`, `powell`, `tnc`,
+`slsqp`, `cobyla`, `nelder-mead`, `cg`) beyond DE/dual-annealing/L-BFGS-B.
 
 The repo additionally enforces planning and verification artifacts to reduce drift.
 

@@ -18,4 +18,11 @@ def test_optimize_smoke() -> None:
         "scipy_de",
         "scipy_dual_annealing",
         "scipy_local_lbfgsb",
+        "scipy_local_powell",
+        "scipy_local_tnc",
+        "scipy_local_slsqp",
+        "scipy_local_cobyla",
+        "scipy_local_nelder_mead",
+        "scipy_local_cg",
+        "scipy_shgo",
     }

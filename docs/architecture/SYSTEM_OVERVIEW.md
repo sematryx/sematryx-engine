@@ -10,7 +10,7 @@ flowchart LR
     SEL --> MEM[(Local Strategy Memory SQLite)]
     SEL --> BANDIT[Contextual Bandit]
     BANDIT --> BANDIT_STATE[(Bandit State JSON)]
-    OPT --> SOLV[SciPy Solvers]
+    OPT --> SOLV[SciPy Solver Roster]
     SOLV --> RES[Optimization Result]
     OPT --> MEM
     RES --> EXP[Structured Explanation Metadata]
@@ -29,3 +29,4 @@ flowchart LR
 - Snapshot version 2 adds reproducible objective-quality rows (isolated memory/bandit paths + scipy solve).
 - Stage 4 topology integration consumes Physarum signal to inform tunneling-oriented strategy routing.
 - Result payload includes structured explanation schema (basis/confidence + topology evidence).
+- Continuous roster now includes multiple SciPy local/global methods to improve Stage 4 routing surface.

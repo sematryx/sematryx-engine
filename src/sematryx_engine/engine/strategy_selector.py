@@ -8,6 +8,13 @@ STRATEGIES = [
     "scipy_de",
     "scipy_dual_annealing",
     "scipy_local_lbfgsb",
+    "scipy_local_powell",
+    "scipy_local_tnc",
+    "scipy_local_slsqp",
+    "scipy_local_cobyla",
+    "scipy_local_nelder_mead",
+    "scipy_local_cg",
+    "scipy_shgo",
 ]
 
 
@@ -72,9 +79,9 @@ class StrategySelector:
     ) -> tuple[str, float, str]:
         # Keep strategy filtering deterministic and simple in v1.
         if features.dimensions > 12:
-            candidates = ["scipy_de", "scipy_dual_annealing"]
+            candidates = ["scipy_de", "scipy_dual_annealing", "scipy_shgo"]
         elif features.complexity == "low":
-            candidates = ["scipy_local_lbfgsb", "scipy_de"]
+            candidates = ["scipy_local_lbfgsb", "scipy_local_powell", "scipy_de"]
         else:
             candidates = list(STRATEGIES)
 
