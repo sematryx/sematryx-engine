@@ -6,6 +6,7 @@
 - Expanded solver portfolio parity vs legacy project.
 - Full core-depth topology-to-solver integration and adaptive retry/tuning loop parity.
 - Longitudinal benchmark trend storage beyond generated snapshot files.
+- Alternative reward transforms (e.g. log-scale) deferred until benchmark evolution metrics exist.
 
 ## Policy
 

@@ -11,6 +11,17 @@ STRATEGIES = [
 ]
 
 
+def memory_override_confidence(usage_count: int) -> float:
+    """Confidence for deterministic domain-memory override from historical usage_count.
+
+    Requires at least three stored runs before override applies; confidence rises with
+    evidence and caps at 0.95.
+    """
+    if usage_count < 3:
+        return 0.0
+    return round(min(0.95, 0.72 + 0.06 * float(usage_count)), 10)
+
+
 class StrategySelector:
     def __init__(
         self,
@@ -40,7 +51,7 @@ class StrategySelector:
             top = recommendations[0]
             # Use deterministic memory override only with enough historical evidence.
             if top.usage_count >= 3:
-                return top.strategy_name, 0.9
+                return top.strategy_name, memory_override_confidence(top.usage_count)
 
         for rec in recommendations:
             if rec.strategy_name in STRATEGIES and rec.strategy_name not in candidates:

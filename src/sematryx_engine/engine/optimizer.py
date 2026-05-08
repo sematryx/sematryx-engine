@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from math import isfinite
+from math import isfinite, sqrt
 from pathlib import Path
 
 from sematryx_engine.api.models import OptimizationResult
@@ -31,8 +31,8 @@ def run_optimization(
     )
 
     best_value = float(scipy_result.fun)
-    # Reward: normalized inverse objective, clipped.
-    reward = 1.0 / (1.0 + max(0.0, best_value))
+    # Reward: sqrt-scaled inverse objective (clipped) for smoother bandit updates across scales.
+    reward = min(1.0, 1.0 / (1.0 + sqrt(max(0.0, best_value))))
     _SELECTOR.update(strategy_name, reward)
     _MEMORY.store_optimization_result(
         strategy_name=strategy_name,
