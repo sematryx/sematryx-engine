@@ -30,6 +30,8 @@ Optimization results also include a structured `explanation` payload describing 
 confidence, and topology-tunneling evidence.
 The continuous strategy roster now includes additional SciPy methods (`shgo`, `powell`, `tnc`,
 `slsqp`, `cobyla`, `nelder-mead`, `cg`) beyond DE/dual-annealing/L-BFGS-B.
+Runtime now supports a bounded autodidactic retry loop (1-3 attempts based on topology budget regime),
+selecting the best attempt and exposing attempt trace data in `explanation`.
 
 The repo additionally enforces planning and verification artifacts to reduce drift.
 

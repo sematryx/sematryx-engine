@@ -9,6 +9,7 @@
 - `ADR-0006-physarum-tunneling-integration.md` - Physarum signal informs tunneling strategy routing
 - `ADR-0007-explanation-schema-contract.md` - Structured explanation contract on optimization results
 - `ADR-0008-legacy-continuous-solver-roster.md` - Expanded SciPy-first continuous strategy roster
+- `ADR-0009-autodidactic-bounded-loop.md` - Topology-budgeted bounded retry loop in optimizer
 
 Add ADR files here using a monotonic sequence, for example:
 
@@ -20,3 +21,4 @@ Add ADR files here using a monotonic sequence, for example:
 - `ADR-0006-physarum-tunneling-integration.md`
 - `ADR-0007-explanation-schema-contract.md`
 - `ADR-0008-legacy-continuous-solver-roster.md`
+- `ADR-0009-autodidactic-bounded-loop.md`

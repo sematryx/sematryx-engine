@@ -31,3 +31,20 @@ def test_optimize_includes_topology_artifact() -> None:
         "memory_override",
         "physarum_tunneling_override",
     }
+
+
+def test_optimize_autodidactic_attempt_loop_records_attempts() -> None:
+    result = optimize(
+        objective_function=sphere,
+        bounds=[(-5.0, 5.0), (-5.0, 5.0)],
+        max_evaluations=900,
+        domain="autodidactic_loop",
+    )
+    assert result.explanation is not None
+    assert result.explanation["attempt_limit"] == 3
+    attempts = result.explanation["attempts"]
+    assert isinstance(attempts, list)
+    assert len(attempts) == 3
+    for row in attempts:
+        assert row["strategy"]
+        assert float(row["best_value"]) >= 0.0
