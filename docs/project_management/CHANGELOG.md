@@ -2,6 +2,7 @@
 
 ## 2026-05-08
 
+- Added deterministic hyperparameter tuning priors from domain/topology/features; scaled autodidactic attempt budgets and SciPy knobs (DE polish/population, DA restart ratio, SHGO sampling) with explanation surfacing.
 - Added bounded autodidactic retry loop (topology-budgeted attempts) and explanation attempt traces; optimizer now selects best attempt result.
 - Expanded continuous solver roster with additional SciPy methods (`shgo`, `powell`, `tnc`, `slsqp`, `cobyla`, `nelder-mead`, `cg`) and wired selector compatibility.
 - Added explanation schema contract on optimization results, including deterministic selection basis/confidence and topology tunneling evidence.

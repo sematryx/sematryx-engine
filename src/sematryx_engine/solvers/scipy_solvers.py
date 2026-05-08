@@ -21,17 +21,40 @@ def solve_with_scipy(
     objective_function: Callable[[list[float]], float],
     bounds: list[tuple[float, float]],
     max_evaluations: int,
+    tuning_priors: dict[str, object] | None = None,
 ) -> OptimizeResult:
+    dims = max(len(bounds), 1)
+
     if strategy == "scipy_de":
+        maxiter = max(1, max_evaluations // dims)
+        polish = True
+        popsize = 15
+        if tuning_priors is not None:
+            if tuning_priors.get("de_polish") is False:
+                polish = False
+            raw_pop = tuning_priors.get("de_population_scale", 1.0)
+            pop_scale = float(raw_pop) if isinstance(raw_pop, (int, float)) else 1.0
+            popsize = max(5, min(35, int(round(15.0 * pop_scale))))
         return differential_evolution(
             func=objective_function,
             bounds=bounds,
-            maxiter=max(1, max_evaluations // max(len(bounds), 1)),
-            polish=True,
+            maxiter=maxiter,
+            polish=polish,
+            popsize=popsize,
             seed=42,
         )
 
     if strategy == "scipy_dual_annealing":
+        if tuning_priors is not None:
+            raw_rtr = tuning_priors.get("dual_annealing_restart_temp_ratio")
+            if isinstance(raw_rtr, (int, float)) and float(raw_rtr) > 0.0:
+                return dual_annealing(
+                    func=objective_function,
+                    bounds=bounds,
+                    maxfun=max_evaluations,
+                    seed=42,
+                    restart_temp_ratio=float(raw_rtr),
+                )
         return dual_annealing(
             func=objective_function,
             bounds=bounds,
@@ -40,10 +63,16 @@ def solve_with_scipy(
         )
 
     if strategy == "scipy_shgo":
+        base_n = max(20, min(80, max_evaluations // dims))
+        n = base_n
+        if tuning_priors is not None:
+            raw_scale = tuning_priors.get("shgo_sampling_scale", 1.0)
+            scale = float(raw_scale) if isinstance(raw_scale, (int, float)) else 1.0
+            n = max(15, min(100, int(round(float(base_n) * scale))))
         return shgo(
             func=objective_function,
             bounds=bounds,
-            n=max(20, min(80, max_evaluations // max(len(bounds), 1))),
+            n=n,
         )
 
     lows, highs = _to_sequence_bounds(bounds)
