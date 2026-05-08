@@ -17,9 +17,9 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 
 ## Next 3 Slices
 
-1. Hyperparameter tuning slice (Stage 4): local tuning priors per domain/problem features.
-2. Explainability depth slice (Stage 4): topology/adaptation evidence in decision traces.
-3. Core-depth validation slice (Stage 4): parity-oriented integration benchmarks and regression gates.
+1. Explainability depth slice (Stage 4): topology/adaptation evidence in decision traces.
+2. Core-depth validation slice (Stage 4): parity-oriented integration benchmarks and regression gates.
+3. Non-SciPy continuous backends slice (Stage 4): optional CMA-ES and scikit-optimize wiring behind extras.
 
 ## Stage 2 Follow-up: Explainability Components
 

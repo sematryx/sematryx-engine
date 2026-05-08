@@ -12,6 +12,7 @@ flowchart LR
     BANDIT --> BANDIT_STATE[(Bandit State JSON)]
     OPT --> SOLV[SciPy Solver Roster]
     OPT --> LOOP[Bounded Autodidactic Loop]
+    OPT --> PRI[Tuning Priors]
     SOLV --> RES[Optimization Result]
     OPT --> MEM
     RES --> EXP[Structured Explanation Metadata]
@@ -32,3 +33,4 @@ flowchart LR
 - Result payload includes structured explanation schema (basis/confidence + topology evidence).
 - Continuous roster now includes multiple SciPy local/global methods to improve Stage 4 routing surface.
 - Optimizer can execute bounded topology-budgeted retries and return per-attempt rationale in explanations.
+- Deterministic tuning priors scale SciPy budgets/settings before each attempt and are echoed in explanations.

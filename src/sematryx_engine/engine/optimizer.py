@@ -6,6 +6,7 @@ from sematryx_engine.api.models import OptimizationResult
 from sematryx_engine.engine.problem_features import extract_problem_features
 from sematryx_engine.engine.strategy_selector import StrategySelector
 from sematryx_engine.engine.topology import build_topology_artifact
+from sematryx_engine.engine.tuning_priors import compute_solver_tuning_priors
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
 from sematryx_engine.solvers.scipy_solvers import solve_with_scipy
 
@@ -54,11 +55,23 @@ def run_optimization(
         domain=domain,
         topology_artifact=topology_artifact.as_dict(),
     )
+    tuning_priors = compute_solver_tuning_priors(
+        features=features,
+        topology_budget_regime=topology_artifact.budget_regime,
+        tunneling_directive=topology_artifact.tunneling_directive,
+        domain=domain,
+    )
     attempt_limit = _attempt_budget(
         max_evaluations=max_evaluations,
         topology_budget_regime=topology_artifact.budget_regime,
     )
     per_attempt_budget = max(20, max_evaluations // attempt_limit)
+    raw_budget_multiplier = tuning_priors["budget_multiplier"]
+    budget_multiplier = (
+        float(raw_budget_multiplier)
+        if isinstance(raw_budget_multiplier, (int, float))
+        else 1.0
+    )
     attempt_plan = [strategy_name]
     while len(attempt_plan) < attempt_limit:
         attempt_plan.append(_fallback_strategy(attempt_plan[-1]))
@@ -67,11 +80,16 @@ def run_optimization(
     best_strategy = strategy_name
     attempt_records: list[dict[str, object]] = []
     for idx, attempt_strategy in enumerate(attempt_plan, start=1):
+        effective_budget = max(
+            20,
+            int(round(per_attempt_budget * budget_multiplier)),
+        )
         scipy_result = solve_with_scipy(
             strategy=attempt_strategy,
             objective_function=objective_function,
             bounds=bounds,
-            max_evaluations=per_attempt_budget,
+            max_evaluations=effective_budget,
+            tuning_priors=tuning_priors,
         )
         value = float(scipy_result.fun)
         attempt_records.append(
@@ -81,6 +99,7 @@ def run_optimization(
                 "best_value": value,
                 "evaluations": int(getattr(scipy_result, "nfev", 0)),
                 "success": bool(getattr(scipy_result, "success", True)),
+                "budget_allocated": effective_budget,
             }
         )
         if best_result is None or value < float(best_result.fun):
@@ -131,5 +150,6 @@ def run_optimization(
             "topology_physarum_tunneling_score": topology_artifact.physarum_tunneling_score,
             "attempt_limit": attempt_limit,
             "attempts": attempt_records,
+            "tuning_priors": tuning_priors,
         },
     )
