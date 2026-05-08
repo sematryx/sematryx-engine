@@ -27,7 +27,11 @@ def run_optimization(
         bounds=bounds,
         max_evaluations=max_evaluations,
     )
-    strategy_name, _confidence = _SELECTOR.select(features, domain=domain)
+    strategy_name, _confidence = _SELECTOR.select(
+        features,
+        domain=domain,
+        topology_artifact=topology_artifact.as_dict(),
+    )
     scipy_result = solve_with_scipy(
         strategy=strategy_name,
         objective_function=objective_function,

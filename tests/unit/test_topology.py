@@ -8,10 +8,12 @@ def test_build_topology_artifact_schema() -> None:
     )
     payload = artifact.as_dict()
 
-    assert payload["version"] == 1
+    assert payload["version"] == 2
     assert payload["dimensions"] == 3
     assert payload["min_span"] == 1.0
     assert payload["max_span"] == 10.0
     assert payload["avg_span"] == 5.0
     assert payload["budget_regime"] == "moderate"
     assert payload["complexity_hint"] == "medium"
+    assert isinstance(payload["physarum_tunneling_score"], float)
+    assert payload["tunneling_directive"] in {"local", "balanced", "aggressive"}
