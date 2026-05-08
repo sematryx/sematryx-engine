@@ -17,3 +17,4 @@
 - Added Stage 4 preview for full core-depth parity including topology-to-solver integration.
 - Added enforceable Adoption Gate workflow and policy checks for new subsystem integrations.
 - Reordered execution sequence to complete benchmark-depth slices before Stage 4, with Stage 3 deferred until after Stage 4 parity.
+- Added `benchmark_metrics` module and benchmark trend report CLI with JSON/Markdown output (`make report-benchmark`).

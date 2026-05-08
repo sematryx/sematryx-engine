@@ -32,6 +32,9 @@ pytest
 ```bash
 # Stage 2 benchmark suite
 make benchmark
+
+# JSON/Markdown trend snapshot (same metrics as performance tests)
+make report-benchmark
 ```
 
 ```python

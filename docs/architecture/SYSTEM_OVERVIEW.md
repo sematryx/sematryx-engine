@@ -13,6 +13,8 @@ flowchart LR
     SOLV --> RES[Optimization Result]
     OPT --> MEM
     RES --> EXP[Explanation Metadata]
+    GEN[Benchmark report CLI] --> BMET[benchmark_metrics]
+    BMET -. offline .-> SEL
 ```
 
 ## Boundaries
@@ -20,3 +22,4 @@ flowchart LR
 - Local-first runtime: no required cloud dependencies in core path.
 - Strategy memory and learning are persisted locally.
 - Integrations beyond local runtime must be optional adapters.
+- Offline benchmark snapshots use `benchmark_metrics` and the report CLI without affecting live optimize paths.

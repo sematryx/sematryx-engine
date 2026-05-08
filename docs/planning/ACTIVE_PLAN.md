@@ -17,14 +17,13 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 
 ## Next 3 Slices
 
-1. Reporting slice: add lightweight trend report generation from benchmark outputs.
-2. Calibration slice: tune selection confidence/reward behavior and lock with tests.
-3. Benchmark evolution slice: add objective-level quality metrics beyond strategy hit-rate.
+1. Calibration slice: tune selection confidence/reward behavior and lock with tests.
+2. Benchmark evolution slice: add objective-level quality metrics beyond strategy hit-rate.
+3. Release-hardening docs slice: status-check naming and multi-job CI branch-rule guidance.
 
 ## Planned Follow-up Slices
 
-4. Release-hardening docs slice: status-check naming and multi-job CI branch-rule guidance.
-5. Stage 4 kickoff slice: topology pipeline scaffolding and baseline integration tests.
+4. Stage 4 kickoff slice: topology pipeline scaffolding and baseline integration tests.
 
 ## Stage 2 Follow-up: Explainability Components
 
