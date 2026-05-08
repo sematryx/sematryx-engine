@@ -22,6 +22,9 @@ selection quality can improve across process restarts.
 
 Bandit rewards from each run use `min(1, 1/(1+sqrt(best_value)))` for smoother updates across objective scales.
 
+Each optimization result now includes a deterministic `topology_artifact` scaffold
+(dimensions, span profile, budget regime, complexity hint) for Stage 4 topology integration.
+
 The repo additionally enforces planning and verification artifacts to reduce drift.
 
 ## Quick Start

@@ -5,6 +5,7 @@
 - Optional adapters for non-local backends (kept out of v1 core path).
 - Expanded solver portfolio parity vs legacy project.
 - Full core-depth topology-to-solver integration and adaptive retry/tuning loop parity.
+- Physarum network integration into solver tunneling decisions (required parity enhancement not implemented in original topology solver).
 - Longitudinal benchmark trend storage beyond generated snapshot files.
 - Alternative reward transforms (e.g. log-scale) deferred pending analysis against objective snapshot metrics.
 

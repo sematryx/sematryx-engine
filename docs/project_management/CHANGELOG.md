@@ -2,6 +2,8 @@
 
 ## 2026-05-08
 
+- Added Stage 4 topology kickoff scaffold: deterministic topology artifact is now emitted on optimization results with baseline unit/integration tests.
+- Documented mandatory Physarum-network-to-tunneling integration requirement for upcoming topology-solver integration slice.
 - Documented execution order: legacy continuous solver roster in Stage 4 before Stage 3 discrete; added Stage 4 slice and acceptance criterion for portfolio parity.
 - Split CI into parallel jobs (`lint`, `typecheck`, `unit-smoke`, `policy`) with aggregate `required-checks` gate; updated release and workflow docs for branch protection naming.
 - Extended domain benchmark snapshot to version 2 with isolated sphere objective runs (`objectives` section).
