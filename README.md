@@ -34,6 +34,8 @@ Runtime now supports a bounded autodidactic retry loop (1-3 attempts based on to
 selecting the best attempt and exposing attempt trace data in `explanation`.
 Solver hyperparameter priors are computed deterministically from domain label, problem complexity,
 and topology regime and are reflected in explanations alongside per-attempt evaluation budgets.
+Explanations additionally expose an adaptation overlay tying topology hints, problem feature summaries,
+retry sequencing, and the winning attempt index.
 
 The repo additionally enforces planning and verification artifacts to reduce drift.
 

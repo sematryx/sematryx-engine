@@ -2,6 +2,7 @@
 
 ## 2026-05-08
 
+- Extended explanations with adaptation depth (topology/problem summaries, planned retries, winning attempt index).
 - Added deterministic hyperparameter tuning priors from domain/topology/features; scaled autodidactic attempt budgets and SciPy knobs (DE polish/population, DA restart ratio, SHGO sampling) with explanation surfacing.
 - Added bounded autodidactic retry loop (topology-budgeted attempts) and explanation attempt traces; optimizer now selects best attempt result.
 - Expanded continuous solver roster with additional SciPy methods (`shgo`, `powell`, `tnc`, `slsqp`, `cobyla`, `nelder-mead`, `cg`) and wired selector compatibility.

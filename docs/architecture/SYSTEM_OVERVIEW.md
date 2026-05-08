@@ -34,3 +34,4 @@ flowchart LR
 - Continuous roster now includes multiple SciPy local/global methods to improve Stage 4 routing surface.
 - Optimizer can execute bounded topology-budgeted retries and return per-attempt rationale in explanations.
 - Deterministic tuning priors scale SciPy budgets/settings before each attempt and are echoed in explanations.
+- Explanations include adaptation overlays referencing topology/problem summaries plus retry winners.
