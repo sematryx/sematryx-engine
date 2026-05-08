@@ -1,0 +1,34 @@
+# PRD-0006: Stage 4 Topology Pipeline Kickoff
+
+## Problem Statement
+
+Stage 4 depends on topology-driven routing and adaptation, but runtime outputs currently expose no
+topology artifact.
+
+## Goals
+
+- Create a deterministic topology artifact from bounds and evaluation budget.
+- Attach topology artifact to optimization results without changing routing behavior.
+- Add baseline tests that validate schema and end-to-end presence in `optimize()`.
+
+## Non-Goals
+
+- No solver routing changes in this slice.
+- No new external dependencies or remote services.
+
+## Functional Requirements
+
+- New topology builder in `src/sematryx_engine/engine/topology.py`.
+- `OptimizationResult` supports optional `topology_artifact`.
+- `run_optimization` always returns a topology artifact.
+
+## Acceptance Criteria (Checklist)
+
+- [x] Artifact includes version, dimensions, span profile, budget regime, complexity hint.
+- [x] Integration test verifies `optimize()` returns topology artifact.
+- [x] Existing optimize behavior remains functional.
+- [x] Governance docs (ADR/VR/plan/changelog/debt) updated.
+
+## Verification Link
+
+`docs/process/verification/VR-0006-topology-pipeline-scaffold.md`

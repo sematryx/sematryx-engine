@@ -17,7 +17,7 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 
 ## Next 3 Slices
 
-1. Stage 4 kickoff slice: topology pipeline scaffolding and baseline integration tests.
+1. Topology-solver integration slice: wire topology (including required Physarum network signal) into tunneling/routing decisions.
 2. Explanation schema slice (explainability track): structured explanation payload on the result model.
 3. Legacy continuous solver roster slice (Stage 4): registry, optional deps, benchmarks (see Stage 4 preview).
 
@@ -94,6 +94,8 @@ adaptive solving loops, richer learning, and complete explainability in the loca
    planning artifact for each optimization run.
 2. Topology-solver integration slice: wire topology signals directly into solver routing,
    initialization, and parameter defaults.
+   - Required enhancement: integrate Physarum-network signals into solver tunneling decisions;
+     this was missing in the original topology solver and is mandatory for parity.
 3. Legacy continuous solver roster slice: port the legacy tool’s non-discrete strategy set
    (SciPy family, scikit-optimize, CMA-ES, and other optional local-first backends) behind a
    registry with optional dependencies, bandit arms, memory keys, and benchmarks per solver class.
@@ -106,10 +108,11 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 
 1. Every optimization run records topology analysis and uses it in solver workflow decisions.
 2. Solver routing and initial parameterization are measurably influenced by topology signals.
-3. The continuous strategy set matches legacy breadth (or documented parity subset + debt for deferrals).
-4. Multi-attempt adaptive loop improves quality on defined benchmark classes.
-5. Hyperparameter priors improve warm-run performance against default baselines.
-6. Explanation output includes topology rationale, adaptation steps, and final decision basis.
+3. Physarum-network output is consumed by the tunneling step and verified in integration tests.
+4. The continuous strategy set matches legacy breadth (or documented parity subset + debt for deferrals).
+5. Multi-attempt adaptive loop improves quality on defined benchmark classes.
+6. Hyperparameter priors improve warm-run performance against default baselines.
+7. Explanation output includes topology rationale, adaptation steps, and final decision basis.
 
 ## Blockers
 

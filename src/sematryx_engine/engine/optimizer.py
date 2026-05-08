@@ -5,6 +5,7 @@ from pathlib import Path
 from sematryx_engine.api.models import OptimizationResult
 from sematryx_engine.engine.problem_features import extract_problem_features
 from sematryx_engine.engine.strategy_selector import StrategySelector
+from sematryx_engine.engine.topology import build_topology_artifact
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
 from sematryx_engine.solvers.scipy_solvers import solve_with_scipy
 
@@ -22,6 +23,10 @@ def run_optimization(
     domain: str = "general",
 ) -> OptimizationResult:
     features = extract_problem_features(bounds=bounds, max_evaluations=max_evaluations)
+    topology_artifact = build_topology_artifact(
+        bounds=bounds,
+        max_evaluations=max_evaluations,
+    )
     strategy_name, _confidence = _SELECTOR.select(features, domain=domain)
     scipy_result = solve_with_scipy(
         strategy=strategy_name,
@@ -61,4 +66,5 @@ def run_optimization(
         evaluations=int(getattr(scipy_result, "nfev", 0)),
         strategy_used=strategy_name,
         success=practical_success,
+        topology_artifact=topology_artifact.as_dict(),
     )
