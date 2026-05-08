@@ -1,4 +1,5 @@
 from sematryx_engine import optimize
+from sematryx_engine.engine.strategy_selector import STRATEGIES
 
 
 def sphere(x: list[float]) -> float:
@@ -15,7 +16,7 @@ def test_optimize_includes_topology_artifact() -> None:
 
     assert result.success is True
     assert len(result.best_solution) == 3
-    assert result.strategy_used
+    assert result.strategy_used in STRATEGIES
     assert result.topology_artifact is not None
     artifact = result.topology_artifact
     assert artifact["version"] == 2

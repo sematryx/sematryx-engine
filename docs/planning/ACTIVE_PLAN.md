@@ -17,9 +17,9 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 
 ## Next 3 Slices
 
-1. Legacy continuous solver roster slice (Stage 4): registry, optional deps, benchmarks (see Stage 4 preview).
-2. Autodidactic loop slice (Stage 4): bounded multi-attempt adaptive retry workflow.
-3. Hyperparameter tuning slice (Stage 4): local tuning priors per domain/problem features.
+1. Autodidactic loop slice (Stage 4): bounded multi-attempt adaptive retry workflow.
+2. Hyperparameter tuning slice (Stage 4): local tuning priors per domain/problem features.
+3. Explainability depth slice (Stage 4): topology/adaptation evidence in decision traces.
 
 ## Stage 2 Follow-up: Explainability Components
 

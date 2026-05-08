@@ -2,6 +2,7 @@
 
 ## 2026-05-08
 
+- Expanded continuous solver roster with additional SciPy methods (`shgo`, `powell`, `tnc`, `slsqp`, `cobyla`, `nelder-mead`, `cg`) and wired selector compatibility.
 - Added explanation schema contract on optimization results, including deterministic selection basis/confidence and topology tunneling evidence.
 - Integrated Physarum-network signal into topology-driven tunneling selection: topology now emits `physarum_tunneling_score`/`tunneling_directive`, and selector routes aggressive cases to tunneling strategy.
 - Added Stage 4 topology kickoff scaffold: deterministic topology artifact is now emitted on optimization results with baseline unit/integration tests.
