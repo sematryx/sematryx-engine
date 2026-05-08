@@ -13,13 +13,13 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 1. Domain benchmark scenarios exist and run in CI/local with reproducible outputs.
 2. Learning quality trend report is generated from benchmark runs.
 3. Strategy confidence/reward behavior is tuned with documented rationale.
-4. Release flow documents include status-check naming and multi-job CI guidance.
+4. Release flow documents include status-check naming and multi-job CI guidance (done).
 
 ## Next 3 Slices
 
-1. Release-hardening docs slice: status-check naming and multi-job CI branch-rule guidance.
-2. Stage 4 kickoff slice: topology pipeline scaffolding and baseline integration tests.
-3. Explanation schema slice (explainability track): structured explanation payload on the result model.
+1. Stage 4 kickoff slice: topology pipeline scaffolding and baseline integration tests.
+2. Explanation schema slice (explainability track): structured explanation payload on the result model.
+3. Legacy continuous solver roster slice (Stage 4): registry, optional deps, benchmarks (see Stage 4 preview).
 
 ## Stage 2 Follow-up: Explainability Components
 
@@ -46,9 +46,18 @@ understand "why this path was chosen" and compare behavior across cold vs warm r
 ## Execution Order Gate
 
 Stage 4 begins only after Stage 2 benchmark-depth slices are complete: reporting (done),
-calibration (done), and objective-level benchmark evolution (done). Stage 3 discrete optimizers begin
-after Stage 4 core-depth parity slices have established stable topology-driven routing and
-adaptive loops.
+calibration (done), and objective-level benchmark evolution (done).
+
+**Legacy continuous solver roster (non-discrete parity with the legacy tool)** is integrated during
+Stage 4—alongside topology-driven routing and adaptive workflow—not after Stage 3 discrete work.
+Rationale: the legacy roster matches today’s continuous problem model; discrete optimizers require
+typed variables, hybrid routing, and additional solvers. Bolting many continuous strategies on before
+routing discipline exists dilutes learning signal; expanding the roster once topology and selection
+can use richer signals matches the Stage 4 goal.
+
+Stage 3 discrete optimizers begin only after Stage 4 core-depth parity slices have established
+stable topology-driven routing, adaptive loops, and **legacy-continuous solver portfolio parity**
+(or an explicitly documented subset with INTEGRATION_DEBT for the remainder).
 
 ## Stage 3 Preview: Discrete Optimizers
 
@@ -85,18 +94,22 @@ adaptive solving loops, richer learning, and complete explainability in the loca
    planning artifact for each optimization run.
 2. Topology-solver integration slice: wire topology signals directly into solver routing,
    initialization, and parameter defaults.
-3. Autodidactic loop slice: add multi-attempt adaptive retry workflow with bounded budgets.
-4. Hyperparameter tuning slice: add local tuning priors per domain/problem features.
-5. Explainability depth slice: include topology evidence and adaptation decisions in traces.
-6. Core-depth validation slice: add parity-oriented integration benchmarks and regression gates.
+3. Legacy continuous solver roster slice: port the legacy tool’s non-discrete strategy set
+   (SciPy family, scikit-optimize, CMA-ES, and other optional local-first backends) behind a
+   registry with optional dependencies, bandit arms, memory keys, and benchmarks per solver class.
+4. Autodidactic loop slice: add multi-attempt adaptive retry workflow with bounded budgets.
+5. Hyperparameter tuning slice: add local tuning priors per domain/problem features.
+6. Explainability depth slice: include topology evidence and adaptation decisions in traces.
+7. Core-depth validation slice: add parity-oriented integration benchmarks and regression gates.
 
 ### Stage Acceptance Criteria
 
 1. Every optimization run records topology analysis and uses it in solver workflow decisions.
 2. Solver routing and initial parameterization are measurably influenced by topology signals.
-3. Multi-attempt adaptive loop improves quality on defined benchmark classes.
-4. Hyperparameter priors improve warm-run performance against default baselines.
-5. Explanation output includes topology rationale, adaptation steps, and final decision basis.
+3. The continuous strategy set matches legacy breadth (or documented parity subset + debt for deferrals).
+4. Multi-attempt adaptive loop improves quality on defined benchmark classes.
+5. Hyperparameter priors improve warm-run performance against default baselines.
+6. Explanation output includes topology rationale, adaptation steps, and final decision basis.
 
 ## Blockers
 

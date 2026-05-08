@@ -35,9 +35,25 @@ Before integrating any candidate subsystem/module, complete the gate in
 Before relying on guardrails, confirm GitHub branch protection for `main` includes:
 
 - Require a pull request before merging
-- Require status checks to pass with `CI / test`
+- Require status checks to pass with `CI / required-checks`
 - Require branches to be up to date before merging
 - Block force pushes and deletions
+
+### CI job names (multi-job workflow)
+
+Workflow file: `.github/workflows/ci.yml`. Status checks appear as:
+
+| Check name | Purpose |
+|------------|---------|
+| `CI / lint` | Ruff on `src`, `tests`, `scripts` |
+| `CI / typecheck` | Mypy on `src` |
+| `CI / unit-smoke` | `pytest tests/unit tests/smoke` |
+| `CI / policy` | Forbidden imports, policy, release checklist scripts |
+| `CI / required-checks` | Passes only if all of the above succeed |
+
+**Branch rule:** set the required check to `CI / required-checks` so a single green gate implies the
+full matrix passed. After changing workflow job IDs, update this table and `RELEASE_CHECKLIST.md`, then
+align the protected branch’s required check name in GitHub settings.
 
 ## Local Commands
 
