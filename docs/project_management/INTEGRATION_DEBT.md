@@ -6,6 +6,7 @@
 - Expanded solver portfolio parity vs legacy project.
 - Non-SciPy legacy continuous backends (CMA-ES, scikit-optimize families) still deferred after SciPy-first roster expansion.
 - Full core-depth topology-to-solver integration and adaptive retry/tuning loop parity.
+- Hyperparameter tuning priors per domain/problem features still deferred after bounded retry loop rollout.
 - Human-readable explanation formatter/output styles deferred; structured explanation schema now in place.
 - Longitudinal benchmark trend storage beyond generated snapshot files.
 - Alternative reward transforms (e.g. log-scale) deferred pending analysis against objective snapshot metrics.

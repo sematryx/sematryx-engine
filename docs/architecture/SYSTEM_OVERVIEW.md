@@ -11,6 +11,7 @@ flowchart LR
     SEL --> BANDIT[Contextual Bandit]
     BANDIT --> BANDIT_STATE[(Bandit State JSON)]
     OPT --> SOLV[SciPy Solver Roster]
+    OPT --> LOOP[Bounded Autodidactic Loop]
     SOLV --> RES[Optimization Result]
     OPT --> MEM
     RES --> EXP[Structured Explanation Metadata]
@@ -30,3 +31,4 @@ flowchart LR
 - Stage 4 topology integration consumes Physarum signal to inform tunneling-oriented strategy routing.
 - Result payload includes structured explanation schema (basis/confidence + topology evidence).
 - Continuous roster now includes multiple SciPy local/global methods to improve Stage 4 routing surface.
+- Optimizer can execute bounded topology-budgeted retries and return per-attempt rationale in explanations.
