@@ -27,8 +27,8 @@ def run_optimization(
         bounds=bounds,
         max_evaluations=max_evaluations,
     )
-    strategy_name, _confidence = _SELECTOR.select(
-        features,
+    strategy_name, selection_confidence, selection_basis = _SELECTOR.select_with_basis(
+        features=features,
         domain=domain,
         topology_artifact=topology_artifact.as_dict(),
     )
@@ -71,4 +71,12 @@ def run_optimization(
         strategy_used=strategy_name,
         success=practical_success,
         topology_artifact=topology_artifact.as_dict(),
+        explanation={
+            "selection_basis": selection_basis,
+            "selection_confidence": selection_confidence,
+            "domain": domain,
+            "strategy_used": strategy_name,
+            "topology_tunneling_directive": topology_artifact.tunneling_directive,
+            "topology_physarum_tunneling_score": topology_artifact.physarum_tunneling_score,
+        },
     )

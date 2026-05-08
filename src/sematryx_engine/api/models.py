@@ -9,3 +9,4 @@ class OptimizationResult:
     strategy_used: str
     success: bool
     topology_artifact: dict[str, object] | None = None
+    explanation: dict[str, object] | None = None

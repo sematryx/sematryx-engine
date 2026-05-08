@@ -30,3 +30,16 @@ def test_result_model_topology_optional_field() -> None:
     )
     assert plain.topology_artifact is None
     assert with_topology.topology_artifact is not None
+
+
+def test_result_model_explanation_optional_field() -> None:
+    result = OptimizationResult(
+        best_solution=[0.0],
+        best_value=1.0,
+        evaluations=2,
+        strategy_used="plain",
+        success=True,
+        explanation={"selection_basis": "bandit"},
+    )
+    assert result.explanation is not None
+    assert result.explanation["selection_basis"] == "bandit"
