@@ -13,6 +13,8 @@
 - `ADR-0010-local-hyperparameter-priors.md` - Deterministic solver tuning priors from domain/topology
 - `ADR-0011-explainability-adaptation-depth.md` - Adaptation overlay fields inside explanations
 - `ADR-0012-core-depth-validation-gates.md` - Parity-oriented integration regression gate
+- `ADR-0013-optional-non-scipy-backends.md` - Optional CMA-ES and skopt strategy wiring
+- `ADR-0012-core-depth-validation-gates.md` - Parity-oriented integration regression gate
 
 Add ADR files here using a monotonic sequence, for example:
 
@@ -28,3 +30,4 @@ Add ADR files here using a monotonic sequence, for example:
 - `ADR-0010-local-hyperparameter-priors.md`
 - `ADR-0011-explainability-adaptation-depth.md`
 - `ADR-0012-core-depth-validation-gates.md`
+- `ADR-0013-optional-non-scipy-backends.md`

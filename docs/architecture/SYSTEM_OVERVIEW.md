@@ -10,7 +10,7 @@ flowchart LR
     SEL --> MEM[(Local Strategy Memory SQLite)]
     SEL --> BANDIT[Contextual Bandit]
     BANDIT --> BANDIT_STATE[(Bandit State JSON)]
-    OPT --> SOLV[SciPy Solver Roster]
+    OPT --> SOLV[Solver Roster (SciPy + Optional)]
     OPT --> LOOP[Bounded Autodidactic Loop]
     OPT --> PRI[Tuning Priors]
     SOLV --> RES[Optimization Result]
@@ -37,3 +37,4 @@ flowchart LR
 - Deterministic tuning priors scale SciPy budgets/settings before each attempt and are echoed in explanations.
 - Explanations include adaptation overlays referencing topology/problem summaries plus retry winners.
 - Core-depth validation tests gate benchmark thresholds and runtime contract parity fields.
+- Optional non-SciPy backends are included only when corresponding packages are installed.

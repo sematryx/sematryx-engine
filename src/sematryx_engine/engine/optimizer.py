@@ -8,7 +8,7 @@ from sematryx_engine.engine.strategy_selector import StrategySelector
 from sematryx_engine.engine.topology import build_topology_artifact
 from sematryx_engine.engine.tuning_priors import compute_solver_tuning_priors
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
-from sematryx_engine.solvers.scipy_solvers import solve_with_scipy
+from sematryx_engine.solvers.strategy_dispatch import solve_with_strategy
 
 _MEMORY = LocalStrategyMemory(Path.home() / ".sematryx" / "strategy_memory.db")
 _SELECTOR = StrategySelector(
@@ -85,7 +85,7 @@ def run_optimization(
             20,
             int(round(per_attempt_budget * budget_multiplier)),
         )
-        scipy_result = solve_with_scipy(
+        scipy_result = solve_with_strategy(
             strategy=attempt_strategy,
             objective_function=objective_function,
             bounds=bounds,

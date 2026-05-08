@@ -38,6 +38,8 @@ Explanations additionally expose an adaptation overlay tying topology hints, pro
 retry sequencing, and the winning attempt index.
 A parity-oriented integration regression gate validates benchmark snapshot thresholds and
 runtime contract completeness across topology + adaptation + tuning-prior surfaces.
+Optional non-SciPy continuous backends (CMA-ES and scikit-optimize families) are wired behind
+runtime availability checks so default installs remain lightweight.
 
 The repo additionally enforces planning and verification artifacts to reduce drift.
 

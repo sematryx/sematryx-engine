@@ -3,6 +3,7 @@ from pathlib import Path
 from sematryx_engine.engine.problem_features import ProblemFeatures
 from sematryx_engine.learning.bandit import StrategyBandit
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
+from sematryx_engine.solvers.non_scipy_solvers import available_optional_strategies
 
 STRATEGIES = [
     "scipy_de",
@@ -15,7 +16,7 @@ STRATEGIES = [
     "scipy_local_nelder_mead",
     "scipy_local_cg",
     "scipy_shgo",
-]
+] + available_optional_strategies()
 
 
 def memory_override_confidence(usage_count: int) -> float:

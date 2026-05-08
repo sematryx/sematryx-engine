@@ -54,3 +54,8 @@ warn_unused_configs = true
 [[tool.mypy.overrides]]
 module = ["scipy", "scipy.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["cma", "skopt", "skopt.*"]
+ignore_missing_imports = true
+
