@@ -8,7 +8,7 @@ from pathlib import Path
 from sematryx_engine.engine.problem_features import extract_problem_features
 from sematryx_engine.engine.strategy_selector import StrategySelector
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
-from sematryx_engine.solvers.scipy_solvers import solve_with_scipy
+from sematryx_engine.solvers.strategy_dispatch import solve_with_strategy
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,7 +58,7 @@ def run_objective_benchmark_isolated(
     selector = StrategySelector(memory=memory, bandit_state_path=bandit_state_path)
     features = extract_problem_features(bounds=bounds, max_evaluations=max_evaluations)
     strategy_name, _confidence = selector.select(features, domain=domain)
-    scipy_result = solve_with_scipy(
+    scipy_result = solve_with_strategy(
         strategy=strategy_name,
         objective_function=sphere_objective,
         bounds=bounds,

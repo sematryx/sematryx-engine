@@ -2,6 +2,7 @@
 
 ## 2026-05-08
 
+- Added optional non-SciPy continuous backend wiring (CMA-ES + scikit-optimize families) behind runtime availability detection and strategy dispatch.
 - Added core-depth parity regression gate test covering snapshot thresholds and full runtime contract surface (topology, adaptation, priors, attempts).
 - Extended explanations with adaptation depth (topology/problem summaries, planned retries, winning attempt index).
 - Added deterministic hyperparameter tuning priors from domain/topology/features; scaled autodidactic attempt budgets and SciPy knobs (DE polish/population, DA restart ratio, SHGO sampling) with explanation surfacing.
