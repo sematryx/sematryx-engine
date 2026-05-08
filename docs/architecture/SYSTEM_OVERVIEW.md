@@ -16,6 +16,7 @@ flowchart LR
     SOLV --> RES[Optimization Result]
     OPT --> MEM
     RES --> EXP[Structured Explanation Metadata]
+    EXP --> FMT[Formatter Helpers]
     GEN[Benchmark report CLI] --> BMET[benchmark_metrics]
     BMET -. selection scenarios .-> SEL
     BMET -. objective snapshots .-> SOLV
@@ -38,3 +39,4 @@ flowchart LR
 - Explanations include adaptation overlays referencing topology/problem summaries plus retry winners.
 - Core-depth validation tests gate benchmark thresholds and runtime contract parity fields.
 - Optional non-SciPy backends are included only when corresponding packages are installed.
+- Concise/verbose formatter helpers summarize explanation payloads for CLI/notebook workflows.
