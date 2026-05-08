@@ -5,7 +5,7 @@ flowchart LR
     U[User Code] --> API[sematryx_engine.api.optimize]
     API --> OPT[Engine Optimizer]
     OPT --> FEAT[Problem Features]
-    OPT --> TOPO[Topology Artifact]
+    OPT --> TOPO[Topology Artifact + Physarum Signal]
     OPT --> SEL[Strategy Selector]
     SEL --> MEM[(Local Strategy Memory SQLite)]
     SEL --> BANDIT[Contextual Bandit]
@@ -27,4 +27,4 @@ flowchart LR
 - Reported selection confidence reflects posterior belief or evidence-scaled memory override.
 - Offline benchmark snapshots use `benchmark_metrics` and the report CLI without affecting live optimize paths.
 - Snapshot version 2 adds reproducible objective-quality rows (isolated memory/bandit paths + scipy solve).
-- Stage 4 kickoff adds a deterministic topology artifact to each result without changing routing yet.
+- Stage 4 topology integration consumes Physarum signal to inform tunneling-oriented strategy routing.

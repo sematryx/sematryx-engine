@@ -24,6 +24,8 @@ Bandit rewards from each run use `min(1, 1/(1+sqrt(best_value)))` for smoother u
 
 Each optimization result now includes a deterministic `topology_artifact` scaffold
 (dimensions, span profile, budget regime, complexity hint) for Stage 4 topology integration.
+The topology artifact now includes Physarum tunneling guidance and can directly influence
+strategy selection for aggressive tunneling cases.
 
 The repo additionally enforces planning and verification artifacts to reduce drift.
 

@@ -17,9 +17,9 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 
 ## Next 3 Slices
 
-1. Topology-solver integration slice: wire topology (including required Physarum network signal) into tunneling/routing decisions.
-2. Explanation schema slice (explainability track): structured explanation payload on the result model.
-3. Legacy continuous solver roster slice (Stage 4): registry, optional deps, benchmarks (see Stage 4 preview).
+1. Explanation schema slice (explainability track): structured explanation payload on the result model.
+2. Legacy continuous solver roster slice (Stage 4): registry, optional deps, benchmarks (see Stage 4 preview).
+3. Autodidactic loop slice (Stage 4): bounded multi-attempt adaptive retry workflow.
 
 ## Stage 2 Follow-up: Explainability Components
 

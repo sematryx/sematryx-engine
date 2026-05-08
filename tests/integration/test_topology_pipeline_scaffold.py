@@ -18,7 +18,8 @@ def test_optimize_includes_topology_artifact() -> None:
     assert result.strategy_used
     assert result.topology_artifact is not None
     artifact = result.topology_artifact
-    assert artifact["version"] == 1
+    assert artifact["version"] == 2
     assert artifact["dimensions"] == 3
     assert artifact["budget_regime"] == "tight"
     assert artifact["complexity_hint"] in {"low", "medium", "high"}
+    assert artifact["tunneling_directive"] in {"local", "balanced", "aggressive"}
