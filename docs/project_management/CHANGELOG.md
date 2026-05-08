@@ -2,6 +2,7 @@
 
 ## 2026-05-08
 
+- Added Stage 3 typed variable descriptor kickoff: continuous descriptors run now, integer/categorical descriptors validate then raise explicit "not yet supported" errors until solver baseline slice.
 - Added explanation formatter helpers (concise + verbose) for structured explanation payloads and exported them in the package API.
 - Added optional non-SciPy continuous backend wiring (CMA-ES + scikit-optimize families) behind runtime availability detection and strategy dispatch.
 - Added core-depth parity regression gate test covering snapshot thresholds and full runtime contract surface (topology, adaptation, priors, attempts).
