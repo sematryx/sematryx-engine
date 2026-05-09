@@ -16,6 +16,7 @@ STRATEGIES = [
     "scipy_local_nelder_mead",
     "scipy_local_cg",
     "scipy_shgo",
+    "discrete_random_neighborhood",
 ] + available_optional_strategies()
 
 

@@ -41,4 +41,4 @@ flowchart LR
 - Core-depth validation tests gate benchmark thresholds and runtime contract parity fields.
 - Optional non-SciPy backends are included only when corresponding packages are installed.
 - Concise/verbose formatter helpers summarize explanation payloads for CLI/notebook workflows.
-- Typed variable descriptors are validated at API entry; non-continuous execution is staged for upcoming Stage 3 solver slices.
+- Typed variable descriptors are validated at API entry; discrete-only runs (`integer`/`categorical`) execute via the `discrete_random_neighborhood` baseline; mixed continuous/discrete calls remain deferred to hybrid routing.

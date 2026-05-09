@@ -2,7 +2,7 @@
 
 ## Current Deferred Items
 
-- Integer/categorical descriptor execution remains deferred to Stage 3 solver baseline + hybrid routing slices.
+- Mixed continuous + discrete routing in a single `optimize()` call remains deferred to the Stage 3 hybrid routing slice (discrete-only baseline is integrated).
 - Optional adapters for non-local backends (kept out of v1 core path).
 - Expanded solver portfolio parity vs legacy project.
 - Non-SciPy legacy continuous backends require optional package installation; calibration depth remains deferred.

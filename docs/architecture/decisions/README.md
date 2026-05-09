@@ -16,7 +16,7 @@
 - `ADR-0013-optional-non-scipy-backends.md` - Optional CMA-ES and skopt strategy wiring
 - `ADR-0014-explanation-formatter-helpers.md` - Concise/verbose explanation render helpers
 - `ADR-0015-stage3-typed-variable-descriptors.md` - Stage 3 descriptor validation contract
-- `ADR-0012-core-depth-validation-gates.md` - Parity-oriented integration regression gate
+- `ADR-0016-stage3-discrete-solver-baseline.md` - Discrete-only baseline solver (random + neighborhood)
 
 Add ADR files here using a monotonic sequence, for example:
 
