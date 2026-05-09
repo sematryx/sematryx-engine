@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-05-09
+
+- Stage 3 discrete solver baseline: discrete-only `variable_descriptors` (`integer` / `categorical`) optimize via `discrete_random_neighborhood` (random search + coordinate neighborhood refinement); mixed continuous + discrete still raises until hybrid routing slice.
+- Descriptor helpers: `classify_descriptor_mix`, `descriptors_to_encoded_bounds`; bandit roster extended with the discrete strategy arm.
+
 ## 2026-05-08
 
 - Added Stage 3 typed variable descriptor kickoff: continuous descriptors run now, integer/categorical descriptors validate then raise explicit "not yet supported" errors until solver baseline slice.

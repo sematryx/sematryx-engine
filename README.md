@@ -41,7 +41,7 @@ runtime contract completeness across topology + adaptation + tuning-prior surfac
 Optional non-SciPy continuous backends (CMA-ES and scikit-optimize families) are wired behind
 runtime availability checks so default installs remain lightweight.
 Concise and verbose explanation formatter helpers are exported for quick human-readable summaries.
-Typed variable descriptors are now accepted by the API; continuous descriptors execute immediately while integer/categorical descriptors are validated and deferred to upcoming Stage 3 solver slices.
+Typed variable descriptors are accepted by the API: continuous-only lists run the SciPy-centric portfolio; discrete-only lists (`integer`/`categorical`) run the `discrete_random_neighborhood` baseline; mixed continuous+discrete calls fail fast until hybrid routing lands.
 
 The repo additionally enforces planning and verification artifacts to reduce drift.
 

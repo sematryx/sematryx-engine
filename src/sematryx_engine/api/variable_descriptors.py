@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Literal, cast
 
 VariableKind = Literal["continuous", "integer", "categorical"]
+
+DescriptorMix = Literal["continuous_only", "discrete_only", "mixed"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,6 +55,36 @@ def normalize_variable_descriptors(
         normalized.append(VariableDescriptor(kind="categorical", categories=tuple(categories)))
 
     return normalized
+
+
+def classify_descriptor_mix(descriptors: list[VariableDescriptor]) -> DescriptorMix:
+    kinds = {d.kind for d in descriptors}
+    has_continuous = "continuous" in kinds
+    has_discrete = "integer" in kinds or "categorical" in kinds
+    if has_continuous and has_discrete:
+        return "mixed"
+    if has_continuous:
+        return "continuous_only"
+    return "discrete_only"
+
+
+def descriptors_to_encoded_bounds(descriptors: list[VariableDescriptor]) -> list[tuple[float, float]]:
+    """Bounds over encoded vectors for topology/feature extraction (discrete-only problems)."""
+    bounds: list[tuple[float, float]] = []
+    for desc in descriptors:
+        if desc.kind == "integer":
+            assert desc.low is not None and desc.high is not None
+            lo = float(math.ceil(float(desc.low)))
+            hi = float(math.floor(float(desc.high)))
+            if lo > hi:
+                raise ValueError("integer variable has empty domain after rounding bounds.")
+            bounds.append((lo, hi))
+        elif desc.kind == "categorical":
+            n = len(desc.categories)
+            bounds.append((0.0, float(n - 1)))
+        else:
+            raise ValueError("descriptors_to_encoded_bounds expects discrete descriptors only.")
+    return bounds
 
 
 def descriptors_to_bounds(descriptors: list[VariableDescriptor]) -> list[tuple[float, float]]:

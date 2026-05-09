@@ -3,11 +3,13 @@ from math import isfinite, sqrt
 from pathlib import Path
 
 from sematryx_engine.api.models import OptimizationResult
+from sematryx_engine.api.variable_descriptors import VariableDescriptor
 from sematryx_engine.engine.problem_features import extract_problem_features
 from sematryx_engine.engine.strategy_selector import StrategySelector
 from sematryx_engine.engine.topology import build_topology_artifact
 from sematryx_engine.engine.tuning_priors import compute_solver_tuning_priors
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
+from sematryx_engine.solvers.discrete_solvers import solve_discrete_baseline
 from sematryx_engine.solvers.strategy_dispatch import solve_with_strategy
 
 _MEMORY = LocalStrategyMemory(Path.home() / ".sematryx" / "strategy_memory.db")
@@ -44,7 +46,94 @@ def run_optimization(
     bounds: list[tuple[float, float]],
     max_evaluations: int,
     domain: str = "general",
+    *,
+    discrete_descriptors: list[VariableDescriptor] | None = None,
 ) -> OptimizationResult:
+    if discrete_descriptors is not None and len(bounds) != len(discrete_descriptors):
+        raise ValueError("bounds length must match discrete_descriptors length.")
+
+    if discrete_descriptors is not None:
+        features = extract_problem_features(bounds=bounds, max_evaluations=max_evaluations)
+        topology_artifact = build_topology_artifact(
+            bounds=bounds,
+            max_evaluations=max_evaluations,
+        )
+        strategy_name = "discrete_random_neighborhood"
+        selection_basis = "discrete_problem_shape"
+        selection_confidence = 1.0
+        tuning_priors = compute_solver_tuning_priors(
+            features=features,
+            topology_budget_regime=topology_artifact.budget_regime,
+            tunneling_directive=topology_artifact.tunneling_directive,
+            domain=domain,
+        )
+        scipy_result = solve_discrete_baseline(
+            objective_function=objective_function,
+            descriptors=discrete_descriptors,
+            max_evaluations=max_evaluations,
+        )
+        best_value = float(scipy_result.fun)
+        reward = min(1.0, 1.0 / (1.0 + sqrt(max(0.0, best_value))))
+        _SELECTOR.update(strategy_name, reward)
+        _MEMORY.store_optimization_result(
+            strategy_name=strategy_name,
+            domain=domain,
+            problem_features={
+                "dimensions": features.dimensions,
+                "avg_range": features.avg_range,
+                "bounded": features.bounded,
+                "budget_per_dimension": features.budget_per_dimension,
+                "complexity": features.complexity,
+            },
+            performance_metrics={
+                "final_value": best_value,
+                "iterations": int(getattr(scipy_result, "nfev", 0)),
+                "time": 0.0,
+                "success": bool(getattr(scipy_result, "success", True)),
+            },
+        )
+        solver_success = bool(getattr(scipy_result, "success", True))
+        practical_success = solver_success or isfinite(best_value)
+        discrete_attempt_records: list[dict[str, object]] = [
+            {
+                "attempt": 1,
+                "strategy": strategy_name,
+                "best_value": best_value,
+                "evaluations": int(getattr(scipy_result, "nfev", 0)),
+                "success": bool(getattr(scipy_result, "success", True)),
+                "budget_allocated": max_evaluations,
+            }
+        ]
+        return OptimizationResult(
+            best_solution=list(scipy_result.x),
+            best_value=best_value,
+            evaluations=int(getattr(scipy_result, "nfev", 0)),
+            strategy_used=strategy_name,
+            success=practical_success,
+            topology_artifact=topology_artifact.as_dict(),
+            explanation={
+                "selection_basis": selection_basis,
+                "selection_confidence": selection_confidence,
+                "domain": domain,
+                "strategy_used": strategy_name,
+                "topology_tunneling_directive": topology_artifact.tunneling_directive,
+                "topology_physarum_tunneling_score": topology_artifact.physarum_tunneling_score,
+                "attempt_limit": 1,
+                "attempts": discrete_attempt_records,
+                "tuning_priors": tuning_priors,
+                "adaptation": {
+                    "topology_budget_regime": topology_artifact.budget_regime,
+                    "topology_complexity_hint": topology_artifact.complexity_hint,
+                    "problem_complexity": features.complexity,
+                    "problem_dimensions": features.dimensions,
+                    "problem_budget_per_dimension": features.budget_per_dimension,
+                    "global_evaluation_budget": max_evaluations,
+                    "planned_strategies": [strategy_name],
+                    "winning_attempt": 1,
+                },
+            },
+        )
+
     features = extract_problem_features(bounds=bounds, max_evaluations=max_evaluations)
     topology_artifact = build_topology_artifact(
         bounds=bounds,

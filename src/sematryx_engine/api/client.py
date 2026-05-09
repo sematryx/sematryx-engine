@@ -2,7 +2,9 @@ from collections.abc import Callable
 
 from sematryx_engine.api.models import OptimizationResult
 from sematryx_engine.api.variable_descriptors import (
+    classify_descriptor_mix,
     descriptors_to_bounds,
+    descriptors_to_encoded_bounds,
     normalize_variable_descriptors,
 )
 from sematryx_engine.engine.optimizer import run_optimization
@@ -18,6 +20,19 @@ def optimize(
 ) -> OptimizationResult:
     if variable_descriptors is not None:
         descriptors = normalize_variable_descriptors(variable_descriptors)
+        mix = classify_descriptor_mix(descriptors)
+        if mix == "mixed":
+            raise ValueError(
+                "Mixed continuous and discrete variables are not supported until Stage 3 hybrid routing."
+            )
+        if mix == "discrete_only":
+            return run_optimization(
+                objective_function=objective_function,
+                bounds=descriptors_to_encoded_bounds(descriptors),
+                max_evaluations=max_evaluations,
+                domain=domain,
+                discrete_descriptors=descriptors,
+            )
         effective_bounds = descriptors_to_bounds(descriptors)
     elif bounds is not None:
         effective_bounds = bounds
