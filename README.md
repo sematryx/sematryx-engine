@@ -57,12 +57,15 @@ pytest
 ```
 
 ```bash
-# Stage 2 benchmark suite
+# Stage 2 benchmark suite (+ Stage 3 discrete validation scenarios)
 make benchmark
 
 # JSON/Markdown trend snapshot (same metrics as performance tests)
 make report-benchmark
 ```
+
+Optional `rng_seed` on `optimize()` fixes randomness for discrete-only and hybrid outer loops (SciPy
+inner solves keep their own seeds).
 
 Snapshots include selection scenarios plus isolated scipy sphere runs (`version` 2, `objectives` section).
 

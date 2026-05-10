@@ -18,6 +18,7 @@ def optimize(
     variable_descriptors: list[dict[str, object]] | None = None,
     max_evaluations: int = 1000,
     domain: str = "general",
+    rng_seed: int | None = None,
 ) -> OptimizationResult:
     if variable_descriptors is not None:
         descriptors = normalize_variable_descriptors(variable_descriptors)
@@ -29,6 +30,7 @@ def optimize(
                 max_evaluations=max_evaluations,
                 domain=domain,
                 hybrid_descriptors=descriptors,
+                rng_seed=rng_seed,
             )
         if mix == "discrete_only":
             return run_optimization(
@@ -37,6 +39,7 @@ def optimize(
                 max_evaluations=max_evaluations,
                 domain=domain,
                 discrete_descriptors=descriptors,
+                rng_seed=rng_seed,
             )
         effective_bounds = descriptors_to_bounds(descriptors)
     elif bounds is not None:
@@ -49,4 +52,5 @@ def optimize(
         bounds=effective_bounds,
         max_evaluations=max_evaluations,
         domain=domain,
+        rng_seed=rng_seed,
     )
