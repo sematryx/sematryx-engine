@@ -18,3 +18,7 @@
 ## Policy
 
 Deferred items must be recorded here before being excluded from the current slice.
+
+## Notes
+
+- 2026-05-11: Continuous-path bandit exclusions for descriptor-only strategies are documented in ADR-0020 (defect guard, not a new deferred capability).

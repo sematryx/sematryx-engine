@@ -127,4 +127,4 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 
 ## Last Updated
 
-2026-05-11 — Stage 3 validation benchmarks integrated; `optimize(rng_seed=...)` for discrete/hybrid reproducibility; execution gate remains linear 2 → 3 → 4.
+2026-05-11 — Continuous bounds-only bandit excludes discrete/hybrid arms (CI regression guard); Stage 3 validation benchmarks integrated; `optimize(rng_seed=...)` for discrete/hybrid reproducibility; execution gate remains linear 2 → 3 → 4.
