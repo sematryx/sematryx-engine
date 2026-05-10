@@ -58,6 +58,32 @@ def normalize_variable_descriptors(
     return normalized
 
 
+def descriptor_learning_features(descriptors: list[VariableDescriptor]) -> dict[str, object]:
+    """Stable JSON-friendly features for memory/analytics on typed-variable runs."""
+    mix = classify_descriptor_mix(descriptors)
+    n_continuous = sum(1 for d in descriptors if d.kind == "continuous")
+    n_integer = sum(1 for d in descriptors if d.kind == "integer")
+    n_categorical = sum(1 for d in descriptors if d.kind == "categorical")
+    log_measure = 0.0
+    for desc in descriptors:
+        if desc.kind == "integer":
+            assert desc.low is not None and desc.high is not None
+            lo = math.ceil(float(desc.low))
+            hi = math.floor(float(desc.high))
+            span = max(1, hi - lo + 1)
+            log_measure += math.log(float(span))
+        elif desc.kind == "categorical":
+            n = len(desc.categories)
+            log_measure += math.log(float(max(1, n)))
+    return {
+        "descriptor_mix": mix,
+        "n_continuous_variables": n_continuous,
+        "n_integer_variables": n_integer,
+        "n_categorical_variables": n_categorical,
+        "log_discrete_configuration_measure": log_measure,
+    }
+
+
 def classify_descriptor_mix(descriptors: list[VariableDescriptor]) -> DescriptorMix:
     kinds = {d.kind for d in descriptors}
     has_continuous = "continuous" in kinds
