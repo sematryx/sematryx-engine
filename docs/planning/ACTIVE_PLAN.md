@@ -2,7 +2,8 @@
 
 ## Current Phase
 
-**Stage 3:** discrete optimizer track (see Next 3 Slices).
+**Stage 3:** discrete optimizer track — **acceptance criteria satisfied** (2026-05-11); optional
+follow-ups and Stage 4 prep remain in Next 3 Slices.
 
 **Stage 2 is closed** (2026-05-11): acceptance criteria and explainability follow-up are satisfied;
 domain benchmarks and integration regression gates run under CI (`integration-performance` job).
@@ -44,9 +45,9 @@ Candidate slices (status):
 
 ## Next 3 Slices
 
-1. Stage 3 acceptance closure: discrete cold→warm selection evidence on validation scenarios (ties Stage 3 acceptance criterion 3).
-2. Optional: wire discrete validation rows into `generate_benchmark_trend_report.py` (debt until needed).
-3. Optional follow-up: Bayesian / acquisition-function hybrid outer loop beyond neighborhood refinement.
+1. Optional follow-up: Bayesian / acquisition-function hybrid outer loop beyond neighborhood refinement.
+2. Stage 4 readiness: confirm Stage 3 acceptance criteria below before prioritizing Stage 4 backlog (linear gate 3 → 4).
+3. Optional: tighten descriptor-learning keyed recommendations (see INTEGRATION_DEBT).
 
 ## Execution Order Gate (linear by stage number)
 
@@ -54,8 +55,8 @@ Stages advance in order: **2 → 3 → 4**. Later stage work is not a prerequisi
 work.
 
 1. **Stage 2** — Quality-to-release readiness (benchmarks in CI, calibration, reporting). **Closed.**
-2. **Stage 3** — Discrete optimizers: finish validation + refinement slices and discrete cold→warm
-   evidence (learning/memory slice integrated). **In progress.**
+2. **Stage 3** — Discrete optimizers: validation, refinement, learning, cold→warm evidence, and
+   trend snapshot integration **complete** (2026-05-11). **Closed for numbered acceptance criteria.**
 3. **Stage 4** — Full core-depth **continuous** parity with the legacy tool (topology depth,
    roster breadth, adaptive loop quality gates, etc.). **Treat remaining Stage 4 backlog as primary
    only after Stage 3 acceptance criteria are met** (or document explicit ADR exception).
@@ -85,7 +86,8 @@ the same local-first learning loop and policy enforcement model.
 
 1. API supports mixed-variable specs with clear validation errors and a hybrid execution path for mixed discrete/continuous descriptors.
 2. At least two discrete-capable strategies are available in the runtime path.
-3. Strategy selection quality improves from cold to warm history on discrete benchmarks.
+3. Strategy selection quality improves from cold to warm history on discrete benchmarks — **met**
+   (`benchmark_metrics` discrete cold/warm scenarios + `test_stage3_discrete_cold_warm_selection`).
 4. Docs and verification artifacts are added for each slice (PRD + verification report).
 
 ## Stage 4 Preview: Full Core-Depth Parity
@@ -127,4 +129,4 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 
 ## Last Updated
 
-2026-05-11 — Stage 3 hybrid outer refinement (random exploration + discrete neighborhood refinement, staged inner budgets; ADR-0021 / PRD-0022 / VR-0022). Continuous bounds-only bandit excludes discrete/hybrid arms; validation benchmarks + `rng_seed` integrated; execution gate remains linear 2 → 3 → 4.
+2026-05-11 — Stage 3 acceptance closure: discrete cold→warm selection metrics in `benchmark_metrics` + trend report; seeded knapsack/assignment objective rows; integration tests. Hybrid refinement + validation + bandit guard precede; execution gate linear 2 → 3 → 4.

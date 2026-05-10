@@ -16,7 +16,7 @@ smoke:
 	.venv311/bin/python -m pytest tests/smoke
 
 benchmark:
-	.venv311/bin/python -m pytest tests/performance tests/integration/test_stage3_discrete_validation_scenarios.py
+	.venv311/bin/python -m pytest tests/performance tests/integration/test_stage3_discrete_validation_scenarios.py tests/integration/test_stage3_discrete_cold_warm_selection.py
 
 report-benchmark:
 	.venv311/bin/python scripts/generate_benchmark_trend_report.py

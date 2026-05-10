@@ -31,7 +31,7 @@ flowchart LR
   features and bandit reward metadata in the JSON feature blob.
 - Integrations beyond local runtime must be optional adapters.
 - Reported selection confidence reflects posterior belief or evidence-scaled memory override.
-- Offline benchmark snapshots use `benchmark_metrics` and the report CLI without affecting live optimize paths.
+- Offline benchmark snapshots use `benchmark_metrics` and the report CLI without affecting live optimize paths; snapshots include discrete cold/warm selection scenarios and seeded knapsack/assignment objective rows alongside sphere cases.
 - Stage 3 discrete validation adds knapsack- and assignment-shaped scenarios (`discrete_benchmark_scenarios`)
   exercised in integration tests and `make benchmark`.
 - Snapshot version 2 adds reproducible objective-quality rows (isolated memory/bandit paths + scipy solve).

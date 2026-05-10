@@ -39,10 +39,17 @@ def test_sphere_objective_reasonable_mid_problem(tmp_path: Path) -> None:
 
 def test_collect_objective_snapshot_matches_standalone_rows(tmp_path: Path) -> None:
     snap = collect_objective_benchmark_snapshot(tmp_path)
-    assert set(snap.keys()) == {"sphere_dim4", "sphere_dim8"}
+    assert set(snap.keys()) == {
+        "sphere_dim4",
+        "sphere_dim8",
+        "knapsack01",
+        "assignment2x2",
+    }
     row4 = snap["sphere_dim4"]
     assert isinstance(row4, dict)
     assert float(row4["best_value"]) < 0.2
+    assert float(snap["knapsack01"]["best_value"]) <= -9.99
+    assert float(snap["assignment2x2"]["best_value"]) <= 3.01
 
 
 def test_sphere_objective_function_contract() -> None:

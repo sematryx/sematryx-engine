@@ -22,28 +22,29 @@ def _render_markdown(payload: dict[str, object], generated_at: str) -> str:
         "| Scenario | Mode | Hit rate | Mean confidence | Runs | Target |",
         "|----------|------|----------|-----------------|------|--------|",
     ]
-    for scenario_key in ("rugged_search", "high_dimensional"):
-        block = scenarios.get(scenario_key, {})
-        if not isinstance(block, dict):
-            continue
-        for mode in ("cold", "warm"):
-            row = block.get(mode)
-            if not isinstance(row, dict):
+    if isinstance(scenarios, dict):
+        for scenario_key in sorted(scenarios.keys()):
+            block = scenarios.get(scenario_key, {})
+            if not isinstance(block, dict):
                 continue
-            lines.append(
-                "| "
-                + " | ".join(
-                    [
-                        str(row.get("domain", scenario_key)),
-                        str(row.get("mode", mode)),
-                        f"{float(row.get('hit_rate', 0)):.4f}",
-                        f"{float(row.get('mean_confidence', 0)):.4f}",
-                        str(row.get("runs", "")),
-                        str(row.get("target_strategy") or "—"),
-                    ]
+            for mode in ("cold", "warm"):
+                row = block.get(mode)
+                if not isinstance(row, dict):
+                    continue
+                lines.append(
+                    "| "
+                    + " | ".join(
+                        [
+                            str(row.get("domain", scenario_key)),
+                            str(row.get("mode", mode)),
+                            f"{float(row.get('hit_rate', 0)):.4f}",
+                            f"{float(row.get('mean_confidence', 0)):.4f}",
+                            str(row.get("runs", "")),
+                            str(row.get("target_strategy") or "—"),
+                        ]
+                    )
+                    + " |"
                 )
-                + " |"
-            )
 
     objectives = payload.get("objectives")
     if isinstance(objectives, dict) and objectives:
@@ -56,7 +57,7 @@ def _render_markdown(payload: dict[str, object], generated_at: str) -> str:
                 "|-----------|------------|-------------|----------|------------|",
             ]
         )
-        for key in ("sphere_dim4", "sphere_dim8"):
+        for key in sorted(objectives.keys()):
             row = objectives.get(key)
             if not isinstance(row, dict):
                 continue
@@ -81,7 +82,7 @@ def _render_markdown(payload: dict[str, object], generated_at: str) -> str:
             "",
             "- Cold rows reflect strategy selection without domain memory.",
             "- Warm rows reflect selection after repeated stored successes for the target strategy.",
-            "- Objective rows summarize isolated scipy runs on sphere objectives.",
+            "- Objective rows include sphere benchmarks plus seeded discrete validation snapshots.",
             "",
         ]
     )
@@ -116,6 +117,7 @@ def main() -> int:
             tmp_path=Path(tmp),
             rugged_runs=args.runs,
             high_dim_runs=args.runs,
+            discrete_selection_runs=args.runs,
         )
     payload_out = {
         "generated_at": generated_at,

@@ -12,7 +12,6 @@
 - Automated hyperparameter search grids / Bayesian tuning deferred beyond deterministic priors.
 - Rich markdown/HTML explanation renderers are deferred; lightweight concise/verbose string helpers are now available.
 - Longitudinal benchmark trend storage beyond generated snapshot files.
-- `generate_benchmark_trend_report.py` does not yet emit discrete validation scenario rows (knapsack / assignment).
 - Alternative reward transforms (e.g. log-scale) deferred pending analysis against objective snapshot metrics.
 
 ## Policy
@@ -22,3 +21,4 @@ Deferred items must be recorded here before being excluded from the current slic
 ## Notes
 
 - 2026-05-11: Continuous-path bandit exclusions for descriptor-only strategies are documented in ADR-0020 (defect guard, not a new deferred capability).
+- 2026-05-11: Discrete benchmark trend rows and cold→warm acceptance evidence documented in ADR-0022 / PRD-0023.
