@@ -17,9 +17,9 @@ Move from "working local engine with guardrails" to "measured, calibrated, and r
 
 ## Next 3 Slices
 
-1. Stage 3 hybrid routing slice: mixed-variable routing and validation gates.
-2. Stage 3 learning slice: discrete-problem features and reward capture in local memory.
-3. Stage 3 validation slice: knapsack/scheduling-style benchmark scenarios for discrete paths.
+1. Stage 3 learning slice: discrete-problem features and reward capture in local memory.
+2. Stage 3 validation slice: knapsack/scheduling-style benchmark scenarios for discrete paths.
+3. Stage 3 refinement slice: smarter hybrid outer search (optional Bayesian / staged budgets), gated by validation metrics.
 
 ## Stage 2 Follow-up: Explainability Components
 
@@ -69,14 +69,14 @@ the same local-first learning loop and policy enforcement model.
 ### Candidate Slices
 
 1. Problem model slice: add typed variable descriptors (`continuous`, `integer`, `categorical`).
-2. Solver slice: add baseline discrete solvers (random search + local neighborhood search).
-3. Hybrid routing slice: route mixed-variable problems to compatible solver pipelines.
+2. Solver slice: add baseline discrete solvers (random search + local neighborhood search). *(integrated)*
+3. Hybrid routing slice: route mixed-variable problems to compatible solver pipelines. *(integrated)*
 4. Learning slice: capture discrete-problem features and strategy rewards in local memory.
 5. Validation slice: add benchmark scenarios for integer knapsack-like and scheduling-like cases.
 
 ### Stage Acceptance Criteria
 
-1. API supports mixed-variable bounds/specs with clear validation errors.
+1. API supports mixed-variable specs with clear validation errors and a hybrid execution path for mixed discrete/continuous descriptors.
 2. At least two discrete-capable strategies are available in the runtime path.
 3. Strategy selection quality improves from cold to warm history on discrete benchmarks.
 4. Docs and verification artifacts are added for each slice (PRD + verification report).

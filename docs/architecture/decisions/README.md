@@ -17,6 +17,7 @@
 - `ADR-0014-explanation-formatter-helpers.md` - Concise/verbose explanation render helpers
 - `ADR-0015-stage3-typed-variable-descriptors.md` - Stage 3 descriptor validation contract
 - `ADR-0016-stage3-discrete-solver-baseline.md` - Discrete-only baseline solver (random + neighborhood)
+- `ADR-0017-stage3-hybrid-routing.md` - Mixed discrete/continuous hybrid routing
 
 Add ADR files here using a monotonic sequence, for example:
 
@@ -35,3 +36,5 @@ Add ADR files here using a monotonic sequence, for example:
 - `ADR-0013-optional-non-scipy-backends.md`
 - `ADR-0014-explanation-formatter-helpers.md`
 - `ADR-0015-stage3-typed-variable-descriptors.md`
+- `ADR-0016-stage3-discrete-solver-baseline.md`
+- `ADR-0017-stage3-hybrid-routing.md`

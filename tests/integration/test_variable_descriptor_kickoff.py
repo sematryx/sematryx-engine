@@ -1,5 +1,3 @@
-import pytest
-
 from sematryx_engine import optimize
 
 
@@ -57,14 +55,23 @@ def test_optimize_categorical_prefers_expected_category() -> None:
     assert int(round(result.best_solution[0])) == 1
 
 
-def test_optimize_rejects_mixed_continuous_discrete() -> None:
-    with pytest.raises(ValueError, match="hybrid routing"):
-        optimize(
-            objective_function=sphere,
-            variable_descriptors=[
-                {"kind": "continuous", "low": 0.0, "high": 1.0},
-                {"kind": "integer", "low": 0, "high": 3},
-            ],
-            max_evaluations=50,
-            domain="stage3_mixed_deferred",
-        )
+def test_optimize_mixed_continuous_integer_uses_hybrid_path() -> None:
+    def mixed_sphere(x: list[float]) -> float:
+        return (x[0] - 0.5) ** 2 + (x[1] - 7.0) ** 2
+
+    result = optimize(
+        objective_function=mixed_sphere,
+        variable_descriptors=[
+            {"kind": "continuous", "low": 0.0, "high": 1.0},
+            {"kind": "integer", "low": 0, "high": 10},
+        ],
+        max_evaluations=600,
+        domain="stage3_hybrid_integer",
+    )
+    assert result.success is True
+    assert result.strategy_used == "hybrid_outer_random_inner_scipy"
+    assert len(result.best_solution) == 2
+    assert abs(result.best_solution[0] - 0.5) < 0.25
+    assert abs(result.best_solution[1] - 7.0) < 2.0
+    adapt = result.explanation["adaptation"]
+    assert "hybrid_inner_strategy" in adapt

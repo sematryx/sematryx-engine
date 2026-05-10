@@ -12,6 +12,7 @@
 
 ## Required Evidence
 
+- [ ] `docs/planning/ACTIVE_PLAN.md` reviewed (updated if slice priorities or acceptance criteria changed)
 - [ ] Tests added/updated for behavior changes
 - [ ] `ruff`, `mypy`, and `pytest` pass locally
 - [ ] Public docs updated if API/behavior changed

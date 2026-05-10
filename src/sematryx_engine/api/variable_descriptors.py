@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from collections.abc import Sequence
 from typing import Literal, cast
 
 VariableKind = Literal["continuous", "integer", "categorical"]
@@ -68,6 +69,55 @@ def classify_descriptor_mix(descriptors: list[VariableDescriptor]) -> Descriptor
     return "discrete_only"
 
 
+def descriptors_to_mixed_encoded_bounds(
+    descriptors: list[VariableDescriptor],
+) -> list[tuple[float, float]]:
+    """Full bound tuple per variable in descriptor order (mixed continuous/discrete)."""
+    bounds: list[tuple[float, float]] = []
+    for desc in descriptors:
+        if desc.kind == "continuous":
+            assert desc.low is not None and desc.high is not None
+            bounds.append((desc.low, desc.high))
+        elif desc.kind == "integer":
+            assert desc.low is not None and desc.high is not None
+            lo = float(math.ceil(float(desc.low)))
+            hi = float(math.floor(float(desc.high)))
+            if lo > hi:
+                raise ValueError("integer variable has empty domain after rounding bounds.")
+            bounds.append((lo, hi))
+        elif desc.kind == "categorical":
+            n = len(desc.categories)
+            bounds.append((0.0, float(n - 1)))
+        else:
+            raise AssertionError("unreachable")
+    return bounds
+
+
+def normalize_mixed_solution(x: Sequence[float], descriptors: list[VariableDescriptor]) -> list[float]:
+    """Clamp/normalize each dimension to valid encoded values."""
+    out: list[float] = []
+    for xi, desc in zip(x, descriptors, strict=True):
+        if desc.kind == "continuous":
+            assert desc.low is not None and desc.high is not None
+            v = float(xi)
+            out.append(max(desc.low, min(desc.high, v)))
+        elif desc.kind == "integer":
+            assert desc.low is not None and desc.high is not None
+            lo = math.ceil(float(desc.low))
+            hi = math.floor(float(desc.high))
+            v = int(round(float(xi)))
+            v = max(lo, min(hi, v))
+            out.append(float(v))
+        elif desc.kind == "categorical":
+            n = len(desc.categories)
+            v = int(round(float(xi)))
+            v = max(0, min(n - 1, v))
+            out.append(float(v))
+        else:
+            raise AssertionError("unreachable")
+    return out
+
+
 def descriptors_to_encoded_bounds(descriptors: list[VariableDescriptor]) -> list[tuple[float, float]]:
     """Bounds over encoded vectors for topology/feature extraction (discrete-only problems)."""
     bounds: list[tuple[float, float]] = []
@@ -92,8 +142,8 @@ def descriptors_to_bounds(descriptors: list[VariableDescriptor]) -> list[tuple[f
     for desc in descriptors:
         if desc.kind != "continuous":
             raise ValueError(
-                "Stage 3 kickoff supports descriptor validation only; integer/categorical solving "
-                "lands in later Stage 3 slices."
+                "continuous_only bounds conversion requires all descriptors to be continuous; "
+                "use discrete-only or mixed routing for other kinds."
             )
         assert desc.low is not None and desc.high is not None
         bounds.append((desc.low, desc.high))

@@ -17,6 +17,7 @@ STRATEGIES = [
     "scipy_local_cg",
     "scipy_shgo",
     "discrete_random_neighborhood",
+    "hybrid_outer_random_inner_scipy",
 ] + available_optional_strategies()
 
 
@@ -78,7 +79,9 @@ class StrategySelector:
         domain: str,
         topology_artifact: dict[str, object] | None = None,
         deterministic_bandit: bool = False,
+        exclude_strategies: frozenset[str] | None = None,
     ) -> tuple[str, float, str]:
+        excluded = exclude_strategies or frozenset()
         # Keep strategy filtering deterministic and simple in v1.
         if features.dimensions > 12:
             candidates = ["scipy_de", "scipy_dual_annealing", "scipy_shgo"]
@@ -86,23 +89,32 @@ class StrategySelector:
             candidates = ["scipy_local_lbfgsb", "scipy_local_powell", "scipy_de"]
         else:
             candidates = list(STRATEGIES)
+        candidates = [c for c in candidates if c not in excluded]
 
         # Domain recommendations can override cold-start when evidence is strong.
         recommendations = self._memory.get_strategy_recommendations(domain=domain, limit=2)
         if recommendations:
             top = recommendations[0]
             # Use deterministic memory override only with enough historical evidence.
-            if top.usage_count >= 3:
+            if top.usage_count >= 3 and top.strategy_name not in excluded:
                 return top.strategy_name, memory_override_confidence(top.usage_count), "memory_override"
 
         tunneling_choice = _topology_tunneling_override(topology_artifact)
         if tunneling_choice is not None:
             strategy, confidence = tunneling_choice
-            return strategy, confidence, "physarum_tunneling_override"
+            if strategy not in excluded:
+                return strategy, confidence, "physarum_tunneling_override"
 
         for rec in recommendations:
-            if rec.strategy_name in STRATEGIES and rec.strategy_name not in candidates:
+            if (
+                rec.strategy_name in STRATEGIES
+                and rec.strategy_name not in candidates
+                and rec.strategy_name not in excluded
+            ):
                 candidates.append(rec.strategy_name)
+
+        if not candidates:
+            candidates = ["scipy_de"]
 
         strategy, confidence = self._bandit.select(candidates, deterministic=deterministic_bandit)
         return strategy, confidence, "bandit"

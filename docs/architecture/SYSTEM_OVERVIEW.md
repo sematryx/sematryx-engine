@@ -41,4 +41,4 @@ flowchart LR
 - Core-depth validation tests gate benchmark thresholds and runtime contract parity fields.
 - Optional non-SciPy backends are included only when corresponding packages are installed.
 - Concise/verbose formatter helpers summarize explanation payloads for CLI/notebook workflows.
-- Typed variable descriptors are validated at API entry; discrete-only runs (`integer`/`categorical`) execute via the `discrete_random_neighborhood` baseline; mixed continuous/discrete calls remain deferred to hybrid routing.
+- Typed variable descriptors are validated at API entry; discrete-only runs (`integer`/`categorical`) use `discrete_random_neighborhood`; mixed continuous + discrete runs use `hybrid_outer_random_inner_scipy` with inner continuous strategy selection excluding discrete-only arms.
