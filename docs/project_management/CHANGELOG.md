@@ -2,6 +2,7 @@
 
 ## 2026-05-11
 
+- `ACTIVE_PLAN.md`: execution gate rewritten as linear Stage 2 → 3 → 4 (removed contradictory “Stage 3 after Stage 4” rule); noted early Stage 4 scaffolding vs current Stage 3 focus.
 - CI: added `integration-performance` job running `pytest tests/integration tests/performance --import-mode=importlib`; `required-checks` now depends on it.
 - Stage 2 closed in `ACTIVE_PLAN.md`: acceptance criteria and explainability follow-up marked complete; current execution focus set to Stage 3 discrete track.
 - `RELEASE_CHECKLIST.md` / `check_release_checklist.py` / `DEVELOPMENT_WORKFLOW.md` updated for the expanded CI matrix.
