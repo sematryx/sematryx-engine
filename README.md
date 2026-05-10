@@ -67,6 +67,9 @@ make report-benchmark
 Optional `rng_seed` on `optimize()` fixes randomness for discrete-only and hybrid outer loops (SciPy
 inner solves keep their own seeds).
 
+Bounds-only continuous runs automatically exclude discrete/hybrid strategy arms from bandit
+selection (those strategies require `variable_descriptors`).
+
 Snapshots include selection scenarios plus isolated scipy sphere runs (`version` 2, `objectives` section).
 
 ```python
