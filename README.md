@@ -50,6 +50,8 @@ The repo additionally enforces planning and verification artifacts to reduce dri
 ```bash
 pip install -e .[dev]
 pytest
+# Full parity with CI (integration + performance; avoids duplicate test module name clash):
+# pytest tests/integration tests/performance --import-mode=importlib
 ```
 
 ```bash

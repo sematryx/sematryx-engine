@@ -49,6 +49,7 @@ Workflow file: `.github/workflows/ci.yml`. Status checks appear as:
 | `CI / lint` | Ruff on `src`, `tests`, `scripts` |
 | `CI / typecheck` | Mypy on `src` |
 | `CI / unit-smoke` | `pytest tests/unit tests/smoke` |
+| `CI / integration-performance` | `pytest tests/integration tests/performance --import-mode=importlib` |
 | `CI / policy` | Forbidden imports, policy, release checklist scripts |
 | `CI / required-checks` | Passes only if all of the above succeed |
 
@@ -63,6 +64,7 @@ align the protected branch’s required check name in GitHub settings.
 .venv311/bin/python -m ruff check src tests scripts
 .venv311/bin/python -m mypy src
 .venv311/bin/python -m pytest tests/unit tests/smoke
+.venv311/bin/python -m pytest tests/integration tests/performance --import-mode=importlib
 .venv311/bin/python scripts/check_forbidden_imports.py
 .venv311/bin/python scripts/check_policy.py
 ```

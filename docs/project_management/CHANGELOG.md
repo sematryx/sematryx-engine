@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-05-11
+
+- CI: added `integration-performance` job running `pytest tests/integration tests/performance --import-mode=importlib`; `required-checks` now depends on it.
+- Stage 2 closed in `ACTIVE_PLAN.md`: acceptance criteria and explainability follow-up marked complete; current execution focus set to Stage 3 discrete track.
+- `RELEASE_CHECKLIST.md` / `check_release_checklist.py` / `DEVELOPMENT_WORKFLOW.md` updated for the expanded CI matrix.
+
 ## 2026-05-10
 
 - Stage 3 hybrid routing: mixed `variable_descriptors` (continuous + integer/categorical) run `hybrid_outer_random_inner_scipy` (random discrete outer samples + inner continuous optimization); selector gains `exclude_strategies` so inner solves cannot pick discrete-only arms.

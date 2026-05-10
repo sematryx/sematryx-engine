@@ -1,7 +1,7 @@
 # Release Checklist
 
 - [ ] `make all` passes
-- [ ] `pytest tests/integration` passes
+- [ ] `CI / required-checks` is green (includes `integration-performance`: `pytest tests/integration tests/performance --import-mode=importlib`)
 - [ ] PRD and verification report are complete
 - [ ] ADR updates merged for architecture changes
 - [ ] CHANGELOG updated
@@ -18,7 +18,8 @@
 
 ### Multi-job CI
 
-GitHub lists each job as `CI / <job name>`. Parallel jobs: `lint`, `typecheck`, `unit-smoke`, `policy`.
-Configure branch protection so **only** `CI / required-checks` is required (it `needs` the four jobs above);
-this keeps one merge gate while preserving parallel runs. Optionally add the four jobs as required too
-for stricter visibility—then all five must pass.
+GitHub lists each job as `CI / <job name>`. Parallel jobs: `lint`, `typecheck`, `unit-smoke`,
+`integration-performance`, `policy`.
+Configure branch protection so **only** `CI / required-checks` is required (it `needs` the five leaf jobs above);
+this keeps one merge gate while preserving parallel runs. Optionally add those leaf jobs as required too
+for stricter visibility.
