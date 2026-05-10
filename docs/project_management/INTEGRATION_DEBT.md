@@ -2,6 +2,8 @@
 
 ## Current Deferred Items
 
+- Selector/memory recommendations remain domain-keyed only; using stored `descriptor_learning_features`
+  to bucket or rank discrete-shaped histories is deferred.
 - Smarter hybrid outer-loop search (beyond uniform discrete sampling) and tighter evaluation budgeting across outer/inner phases.
 - Optional adapters for non-local backends (kept out of v1 core path).
 - Expanded solver portfolio parity vs legacy project.

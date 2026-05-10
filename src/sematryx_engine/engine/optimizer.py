@@ -3,8 +3,11 @@ from math import isfinite, sqrt
 from pathlib import Path
 
 from sematryx_engine.api.models import OptimizationResult
-from sematryx_engine.api.variable_descriptors import VariableDescriptor
-from sematryx_engine.engine.problem_features import extract_problem_features
+from sematryx_engine.api.variable_descriptors import (
+    VariableDescriptor,
+    descriptor_learning_features,
+)
+from sematryx_engine.engine.problem_features import ProblemFeatures, extract_problem_features
 from sematryx_engine.engine.strategy_selector import StrategySelector
 from sematryx_engine.engine.topology import build_topology_artifact
 from sematryx_engine.engine.tuning_priors import compute_solver_tuning_priors
@@ -33,6 +36,27 @@ def _attempt_budget(
     if topology_budget_regime == "moderate":
         return 2
     return 1
+
+
+def _typed_memory_problem_features(
+    features: ProblemFeatures,
+    *,
+    descriptors: list[VariableDescriptor],
+    bandit_reward: float,
+    hybrid_inner_strategy: str | None = None,
+) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "dimensions": features.dimensions,
+        "avg_range": features.avg_range,
+        "bounded": features.bounded,
+        "budget_per_dimension": features.budget_per_dimension,
+        "complexity": features.complexity,
+    }
+    payload.update(descriptor_learning_features(descriptors))
+    payload["optimizer_bandit_reward"] = bandit_reward
+    if hybrid_inner_strategy is not None:
+        payload["hybrid_inner_strategy"] = hybrid_inner_strategy
+    return payload
 
 
 def _fallback_strategy(primary: str) -> str:
@@ -101,16 +125,16 @@ def run_optimization(
         best_value = float(scipy_result.fun)
         reward = min(1.0, 1.0 / (1.0 + sqrt(max(0.0, best_value))))
         _SELECTOR.update(strategy_name, reward)
+        learning = descriptor_learning_features(hybrid_descriptors)
         _MEMORY.store_optimization_result(
             strategy_name=strategy_name,
             domain=domain,
-            problem_features={
-                "dimensions": features.dimensions,
-                "avg_range": features.avg_range,
-                "bounded": features.bounded,
-                "budget_per_dimension": features.budget_per_dimension,
-                "complexity": features.complexity,
-            },
+            problem_features=_typed_memory_problem_features(
+                features,
+                descriptors=hybrid_descriptors,
+                bandit_reward=reward,
+                hybrid_inner_strategy=inner_strategy,
+            ),
             performance_metrics={
                 "final_value": best_value,
                 "iterations": int(getattr(scipy_result, "nfev", 0)),
@@ -159,6 +183,7 @@ def run_optimization(
                     "hybrid_inner_strategy": inner_strategy,
                     "hybrid_inner_selection_basis": inner_basis,
                     "hybrid_inner_selection_confidence": inner_confidence,
+                    "descriptor_learning": learning,
                 },
             },
         )
@@ -186,16 +211,15 @@ def run_optimization(
         best_value = float(scipy_result.fun)
         reward = min(1.0, 1.0 / (1.0 + sqrt(max(0.0, best_value))))
         _SELECTOR.update(strategy_name, reward)
+        learning = descriptor_learning_features(discrete_descriptors)
         _MEMORY.store_optimization_result(
             strategy_name=strategy_name,
             domain=domain,
-            problem_features={
-                "dimensions": features.dimensions,
-                "avg_range": features.avg_range,
-                "bounded": features.bounded,
-                "budget_per_dimension": features.budget_per_dimension,
-                "complexity": features.complexity,
-            },
+            problem_features=_typed_memory_problem_features(
+                features,
+                descriptors=discrete_descriptors,
+                bandit_reward=reward,
+            ),
             performance_metrics={
                 "final_value": best_value,
                 "iterations": int(getattr(scipy_result, "nfev", 0)),
@@ -241,6 +265,7 @@ def run_optimization(
                     "global_evaluation_budget": max_evaluations,
                     "planned_strategies": [strategy_name],
                     "winning_attempt": 1,
+                    "descriptor_learning": learning,
                 },
             },
         )

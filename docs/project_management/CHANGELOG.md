@@ -2,6 +2,8 @@
 
 ## 2026-05-11
 
+- Stage 3 learning slice: discrete/hybrid runs persist `descriptor_learning_features` plus `optimizer_bandit_reward` (and hybrid inner strategy) in local memory JSON; explanations expose `adaptation.descriptor_learning`.
+- PRD-0019 / VR-0019 / ADR-0018; `ACTIVE_PLAN` candidate slice 4 marked integrated and Next 3 Slices rolled forward.
 - `ACTIVE_PLAN.md`: execution gate rewritten as linear Stage 2 → 3 → 4 (removed contradictory “Stage 3 after Stage 4” rule); noted early Stage 4 scaffolding vs current Stage 3 focus.
 - CI: added `integration-performance` job running `pytest tests/integration tests/performance --import-mode=importlib`; `required-checks` now depends on it.
 - Stage 2 closed in `ACTIVE_PLAN.md`: acceptance criteria and explainability follow-up marked complete; current execution focus set to Stage 3 discrete track.

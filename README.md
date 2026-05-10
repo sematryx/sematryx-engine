@@ -16,6 +16,8 @@ and forbidden-import checks to keep a strict local-first boundary.
 
 Learning behavior includes a deterministic memory override when enough local evidence
 exists for a domain strategy, with bandit selection remaining the default path.
+Discrete-only and hybrid runs additionally record descriptor-shape statistics and the
+clipped bandit reward on each SQLite memory row (`features_json`).
 
 Bandit learning state is persisted locally at `~/.sematryx/bandit_state.json` so
 selection quality can improve across process restarts.

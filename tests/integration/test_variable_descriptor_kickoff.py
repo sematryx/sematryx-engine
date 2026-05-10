@@ -36,6 +36,9 @@ def test_optimize_integer_descriptors_uses_discrete_baseline() -> None:
     assert result.strategy_used == "discrete_random_neighborhood"
     assert len(result.best_solution) == 2
     assert all(abs(v - 5.0) < 1.5 for v in result.best_solution)
+    dl = result.explanation["adaptation"]["descriptor_learning"]
+    assert dl["descriptor_mix"] == "discrete_only"
+    assert dl["n_integer_variables"] == 2
 
 
 def test_optimize_categorical_prefers_expected_category() -> None:
@@ -53,6 +56,9 @@ def test_optimize_categorical_prefers_expected_category() -> None:
     )
     assert result.success is True
     assert int(round(result.best_solution[0])) == 1
+    dl = result.explanation["adaptation"]["descriptor_learning"]
+    assert dl["descriptor_mix"] == "discrete_only"
+    assert dl["n_categorical_variables"] == 1
 
 
 def test_optimize_mixed_continuous_integer_uses_hybrid_path() -> None:
@@ -75,3 +81,6 @@ def test_optimize_mixed_continuous_integer_uses_hybrid_path() -> None:
     assert abs(result.best_solution[1] - 7.0) < 2.0
     adapt = result.explanation["adaptation"]
     assert "hybrid_inner_strategy" in adapt
+    assert adapt["descriptor_learning"]["descriptor_mix"] == "mixed"
+    assert adapt["descriptor_learning"]["n_continuous_variables"] == 1
+    assert adapt["descriptor_learning"]["n_integer_variables"] == 1

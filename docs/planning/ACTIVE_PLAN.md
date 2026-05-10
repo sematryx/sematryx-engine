@@ -44,9 +44,9 @@ Candidate slices (status):
 
 ## Next 3 Slices
 
-1. Stage 3 learning slice: discrete-problem features and reward capture in local memory.
-2. Stage 3 validation slice: knapsack/scheduling-style benchmark scenarios for discrete paths.
-3. Stage 3 refinement slice: smarter hybrid outer search (optional Bayesian / staged budgets), gated by validation metrics.
+1. Stage 3 validation slice: knapsack/scheduling-style benchmark scenarios for discrete paths.
+2. Stage 3 refinement slice: smarter hybrid outer search (optional Bayesian / staged budgets), gated by validation metrics.
+3. Stage 3 acceptance closure: discrete cold→warm selection evidence on validation scenarios (ties Stage 3 acceptance criterion 3).
 
 ## Execution Order Gate (linear by stage number)
 
@@ -54,8 +54,8 @@ Stages advance in order: **2 → 3 → 4**. Later stage work is not a prerequisi
 work.
 
 1. **Stage 2** — Quality-to-release readiness (benchmarks in CI, calibration, reporting). **Closed.**
-2. **Stage 3** — Discrete optimizers: finish acceptance criteria (learning, validation, refinement
-   slices and discrete cold→warm evidence). **In progress.**
+2. **Stage 3** — Discrete optimizers: finish validation + refinement slices and discrete cold→warm
+   evidence (learning/memory slice integrated). **In progress.**
 3. **Stage 4** — Full core-depth **continuous** parity with the legacy tool (topology depth,
    roster breadth, adaptive loop quality gates, etc.). **Treat remaining Stage 4 backlog as primary
    only after Stage 3 acceptance criteria are met** (or document explicit ADR exception).
@@ -78,7 +78,7 @@ the same local-first learning loop and policy enforcement model.
 1. Problem model slice: add typed variable descriptors (`continuous`, `integer`, `categorical`).
 2. Solver slice: add baseline discrete solvers (random search + local neighborhood search). *(integrated)*
 3. Hybrid routing slice: route mixed-variable problems to compatible solver pipelines. *(integrated)*
-4. Learning slice: capture discrete-problem features and strategy rewards in local memory.
+4. Learning slice: capture discrete-problem features and strategy rewards in local memory. *(integrated)*
 5. Validation slice: add benchmark scenarios for integer knapsack-like and scheduling-like cases.
 
 ### Stage Acceptance Criteria
@@ -127,4 +127,4 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 
 ## Last Updated
 
-2026-05-11 (execution gate corrected to linear 2 → 3 → 4)
+2026-05-11 — Stage 3 learning/memory slice integrated; execution gate remains linear 2 → 3 → 4.
