@@ -88,10 +88,16 @@ class LocalStrategyMemory:
         self,
         domain: str,
         limit: int = 3,
+        *,
+        descriptor_mix: str | None = None,
     ) -> list[StrategyRecommendation]:
-        with self._connection() as conn:
-            rows = conn.execute(
-                """
+        """Rank strategies by average final_value for a domain.
+
+        When ``descriptor_mix`` is set (e.g. ``\"mixed\"``, ``\"discrete_only\"``), only rows whose
+        ``features_json`` contains that ``descriptor_mix`` value are aggregated. If that yields no
+        rows, falls back to domain-only aggregation.
+        """
+        base_sql = """
                 SELECT
                     strategy,
                     AVG(final_value) AS avg_performance,
@@ -100,13 +106,35 @@ class LocalStrategyMemory:
                     AVG(solve_time) AS avg_time
                 FROM optimization_runs
                 WHERE domain = ?
+                """
+        group_sql = """
                 GROUP BY strategy
                 HAVING usage_count >= 1
                 ORDER BY avg_performance ASC, usage_count DESC
                 LIMIT ?
-                """,
-                (domain, limit),
-            ).fetchall()
+                """
+
+        with self._connection() as conn:
+            if descriptor_mix is None:
+                rows = conn.execute(
+                    base_sql + group_sql,
+                    (domain, limit),
+                ).fetchall()
+            else:
+                filtered = (
+                    base_sql
+                    + " AND json_extract(features_json, '$.descriptor_mix') = ? "
+                    + group_sql
+                )
+                rows = conn.execute(
+                    filtered,
+                    (domain, descriptor_mix, limit),
+                ).fetchall()
+                if not rows:
+                    rows = conn.execute(
+                        base_sql + group_sql,
+                        (domain, limit),
+                    ).fetchall()
 
         return [
             StrategyRecommendation(

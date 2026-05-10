@@ -23,6 +23,7 @@
 - `ADR-0020-continuous-bandit-strategy-exclusions.md` - Bounds-only runs exclude discrete/hybrid bandit arms
 - `ADR-0021-stage3-hybrid-outer-refinement.md` - Hybrid outer exploration + discrete neighborhood refinement
 - `ADR-0022-stage3-discrete-trend-acceptance.md` - Discrete cold/warm snapshot + trend rows
+- `ADR-0023-stage3-optional-acquisition-memory.md` - Hybrid LCB acquisition + descriptor_mix memory filter
 
 Add ADR files here using a monotonic sequence, for example:
 
@@ -48,3 +49,4 @@ Add ADR files here using a monotonic sequence, for example:
 - `ADR-0020-continuous-bandit-strategy-exclusions.md`
 - `ADR-0021-stage3-hybrid-outer-refinement.md`
 - `ADR-0022-stage3-discrete-trend-acceptance.md`
+- `ADR-0023-stage3-optional-acquisition-memory.md`

@@ -18,8 +18,8 @@ the discrete baseline’s neighborhood phase.
 2. **Staged inner budgets**: refinement iterations use `inner_budget_refine` (favors larger
    inner budgets when remaining budget allows) vs exploration’s schedule.
 3. Expose `discrete_coordinate_neighbors` as a public helper in `discrete_solvers` for reuse.
-4. Set `OptimizeResult.message` to `hybrid_outer_random_inner_scipy_refined` to distinguish the
-   runtime from the pre-refinement implementation (bandit `strategy_used` remains the composite
+4. Set `OptimizeResult.message` to track outer-loop variants (currently
+   `hybrid_outer_acquisition_lcb_inner_scipy_refined`; bandit `strategy_used` remains the composite
    `hybrid_outer_random_inner_scipy` ID).
 
 ## Alternatives Considered

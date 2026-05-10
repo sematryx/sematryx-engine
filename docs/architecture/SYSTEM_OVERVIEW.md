@@ -46,4 +46,7 @@ flowchart LR
 - Concise/verbose formatter helpers summarize explanation payloads for CLI/notebook workflows.
 - Typed variable descriptors are validated at API entry; discrete-only runs (`integer`/`categorical`) use `discrete_random_neighborhood`; mixed continuous + discrete runs use `hybrid_outer_random_inner_scipy` with inner continuous strategy selection excluding discrete-only arms.
 - Bounds-only continuous runs exclude discrete/hybrid strategy IDs from bandit selection so routing stays compatible with `solve_with_strategy`.
-- Mixed hybrid runs use random discrete exploration plus coordinate neighborhood refinement on the best discrete shell (inner SciPy per shell), with deduplicated discrete assignments.
+- Mixed hybrid runs use **LCB acquisition** over discrete shells (random + incumbent neighbors),
+  then sorted neighbor refinement (inner SciPy per shell), with deduplicated discrete assignments.
+- Hybrid inner continuous strategy selection may consult SQLite memory scoped by `descriptor_mix`
+  (`json_extract` on stored feature JSON).

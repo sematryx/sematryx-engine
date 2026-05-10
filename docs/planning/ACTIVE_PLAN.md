@@ -2,16 +2,20 @@
 
 ## Current Phase
 
-**Stage 3:** discrete optimizer track — **acceptance criteria satisfied** (2026-05-11); optional
-follow-ups and Stage 4 prep remain in Next 3 Slices.
+**Stage 4:** core-depth continuous parity — topology integration depth, roster breadth, adaptive
+loop quality gates (see Stage 4 Preview).
+
+**Stage 3 is closed** (2026-05-11): numbered acceptance criteria satisfied; optional acquisition +
+descriptor-scoped memory slices integrated (ADR-0023).
 
 **Stage 2 is closed** (2026-05-11): acceptance criteria and explainability follow-up are satisfied;
 domain benchmarks and integration regression gates run under CI (`integration-performance` job).
 
 ## Stage Goal (Stage 3 focus)
 
-Continue first-class discrete support (learning → validation → refinement) while preserving the
-local-first learning loop and policy model.
+**Achieved (2026-05-11):** discrete descriptors, hybrid routing, learning/memory fields, validation
+benchmarks, cold→warm evidence, trend snapshots, hybrid outer refinement + LCB acquisition, and
+descriptor_mix-scoped inner recommendations — without weakening the local-first policy model.
 
 ## Stage 2 — Complete
 
@@ -45,9 +49,9 @@ Candidate slices (status):
 
 ## Next 3 Slices
 
-1. Optional follow-up: Bayesian / acquisition-function hybrid outer loop beyond neighborhood refinement.
-2. Stage 4 readiness: confirm Stage 3 acceptance criteria below before prioritizing Stage 4 backlog (linear gate 3 → 4).
-3. Optional: tighten descriptor-learning keyed recommendations (see INTEGRATION_DEBT).
+1. Stage 4 topology–solver integration: deepen Physarum tunneling + routing evidence beyond scaffolding.
+2. Stage 4 legacy continuous roster: close parity gaps called out in subsystem docs / debt register.
+3. Stage 4 autodidactic loop: measurable improvements on expanded benchmark classes (ties Stage 4 acceptance criterion 5).
 
 ## Execution Order Gate (linear by stage number)
 
@@ -55,24 +59,25 @@ Stages advance in order: **2 → 3 → 4**. Later stage work is not a prerequisi
 work.
 
 1. **Stage 2** — Quality-to-release readiness (benchmarks in CI, calibration, reporting). **Closed.**
-2. **Stage 3** — Discrete optimizers: validation, refinement, learning, cold→warm evidence, and
-   trend snapshot integration **complete** (2026-05-11). **Closed for numbered acceptance criteria.**
+2. **Stage 3** — Discrete optimizers: validation, refinement, learning, cold→warm evidence, trend
+   snapshots, and optional acquisition + descriptor_mix memory **complete** (2026-05-11).
+   **Closed.**
 3. **Stage 4** — Full core-depth **continuous** parity with the legacy tool (topology depth,
-   roster breadth, adaptive loop quality gates, etc.). **Treat remaining Stage 4 backlog as primary
-   only after Stage 3 acceptance criteria are met** (or document explicit ADR exception).
+   roster breadth, adaptive loop quality gates, etc.). **Primary numbered focus now** that Stage 3
+   is closed (or document explicit ADR exception if reprioritizing).
 
-**Historical note:** Some Stage 4-oriented scaffolding (topology artifact, tunneling, expanded
-continuous roster, autodidactic loop, priors, core-depth tests) landed while Stage 2 was still
-open. That does not redefine stage order: **Stage 3 discrete remains the current numbered focus
-until its acceptance criteria are satisfied;** remaining Stage 4 acceptance checks are then closed
-out against `main` deliberately in Stage 4 order.
+**Historical note:** Stage 4-oriented scaffolding (topology artifact, tunneling, expanded
+continuous roster, autodidactic loop, priors, core-depth tests) landed incrementally while Stage 2
+and Stage 3 were open. **Stage order stays 2 → 3 → 4:** Stage 3 discrete work and its optional
+follow-ups are finished (2026-05-11); remaining roadmap execution continues under **Stage 4**
+unless an ADR records an explicit gate exception.
 
 ## Stage 3 Preview: Discrete Optimizers
 
 ### Stage Goal
 
 Add first-class support for integer and categorical decision variables while preserving
-the same local-first learning loop and policy enforcement model.
+the same local-first learning loop and policy enforcement model. **Met.**
 
 ### Candidate Slices
 
@@ -81,6 +86,7 @@ the same local-first learning loop and policy enforcement model.
 3. Hybrid routing slice: route mixed-variable problems to compatible solver pipelines. *(integrated)*
 4. Learning slice: capture discrete-problem features and strategy rewards in local memory. *(integrated)*
 5. Validation slice: add benchmark scenarios for integer knapsack-like and scheduling-like cases. *(integrated: knapsack-01 + 2×2 assignment; `make benchmark` + integration tests)*
+6. Optional closure slice: hybrid outer LCB acquisition + descriptor_mix-scoped memory for inner SciPy selection. *(integrated; ADR-0023)*
 
 ### Stage Acceptance Criteria
 
@@ -129,4 +135,4 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 
 ## Last Updated
 
-2026-05-11 — Stage 3 acceptance closure: discrete cold→warm selection metrics in `benchmark_metrics` + trend report; seeded knapsack/assignment objective rows; integration tests. Hybrid refinement + validation + bandit guard precede; execution gate linear 2 → 3 → 4.
+2026-05-11 — Stage 3 optional closure (ADR-0023): hybrid LCB acquisition outer loop + descriptor_mix SQLite memory filter + hybrid inner wiring; ACTIVE_PLAN Stage 4 primary; stale gate paragraph corrected. Prior: acceptance closure + hybrid refinement + validation + bandit guard.

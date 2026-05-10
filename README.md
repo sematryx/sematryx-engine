@@ -43,7 +43,9 @@ runtime contract completeness across topology + adaptation + tuning-prior surfac
 Optional non-SciPy continuous backends (CMA-ES and scikit-optimize families) are wired behind
 runtime availability checks so default installs remain lightweight.
 Concise and verbose explanation formatter helpers are exported for quick human-readable summaries.
-Typed variable descriptors are accepted by the API: continuous-only lists run the SciPy-centric portfolio; discrete-only lists (`integer`/`categorical`) run the `discrete_random_neighborhood` baseline; mixed continuous + discrete lists run `hybrid_outer_random_inner_scipy` (random discrete exploration, then discrete coordinate neighborhood refinement, with inner continuous solves per shell).
+Typed variable descriptors are accepted by the API: continuous-only lists run the SciPy-centric portfolio; discrete-only lists (`integer`/`categorical`) run the `discrete_random_neighborhood` baseline; mixed continuous + discrete lists run `hybrid_outer_random_inner_scipy` (LCB-style discrete shell
+acquisition, neighborhood refinement, inner continuous solves per shell; inner SciPy arm may use
+`descriptor_mix`-scoped memory).
 
 The repo additionally enforces planning and verification artifacts to reduce drift.
 
