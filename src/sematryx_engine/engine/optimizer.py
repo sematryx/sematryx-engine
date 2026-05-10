@@ -1,3 +1,4 @@
+import random
 from collections.abc import Callable
 from math import isfinite, sqrt
 from pathlib import Path
@@ -77,6 +78,7 @@ def run_optimization(
     *,
     discrete_descriptors: list[VariableDescriptor] | None = None,
     hybrid_descriptors: list[VariableDescriptor] | None = None,
+    rng_seed: int | None = None,
 ) -> OptimizationResult:
     if discrete_descriptors is not None and hybrid_descriptors is not None:
         raise ValueError("Cannot pass both discrete_descriptors and hybrid_descriptors.")
@@ -121,6 +123,7 @@ def run_optimization(
             max_evaluations=max_evaluations,
             inner_strategy=inner_strategy,
             tuning_priors=tuning_priors,
+            rng=random.Random(rng_seed) if rng_seed is not None else None,
         )
         best_value = float(scipy_result.fun)
         reward = min(1.0, 1.0 / (1.0 + sqrt(max(0.0, best_value))))
@@ -207,6 +210,7 @@ def run_optimization(
             objective_function=objective_function,
             descriptors=discrete_descriptors,
             max_evaluations=max_evaluations,
+            rng=random.Random(rng_seed) if rng_seed is not None else None,
         )
         best_value = float(scipy_result.fun)
         reward = min(1.0, 1.0 / (1.0 + sqrt(max(0.0, best_value))))

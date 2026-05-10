@@ -19,6 +19,7 @@
 - `ADR-0016-stage3-discrete-solver-baseline.md` - Discrete-only baseline solver (random + neighborhood)
 - `ADR-0017-stage3-hybrid-routing.md` - Mixed discrete/continuous hybrid routing
 - `ADR-0018-stage3-discrete-learning-memory.md` - Descriptor learning features in memory + explanations
+- `ADR-0019-stage3-discrete-validation-benchmarks.md` - Discrete validation scenarios + rng_seed
 
 Add ADR files here using a monotonic sequence, for example:
 
@@ -40,3 +41,4 @@ Add ADR files here using a monotonic sequence, for example:
 - `ADR-0016-stage3-discrete-solver-baseline.md`
 - `ADR-0017-stage3-hybrid-routing.md`
 - `ADR-0018-stage3-discrete-learning-memory.md`
+- `ADR-0019-stage3-discrete-validation-benchmarks.md`

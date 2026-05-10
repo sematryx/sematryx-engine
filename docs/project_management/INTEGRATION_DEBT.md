@@ -12,6 +12,7 @@
 - Automated hyperparameter search grids / Bayesian tuning deferred beyond deterministic priors.
 - Rich markdown/HTML explanation renderers are deferred; lightweight concise/verbose string helpers are now available.
 - Longitudinal benchmark trend storage beyond generated snapshot files.
+- `generate_benchmark_trend_report.py` does not yet emit discrete validation scenario rows (knapsack / assignment).
 - Alternative reward transforms (e.g. log-scale) deferred pending analysis against objective snapshot metrics.
 
 ## Policy

@@ -2,6 +2,8 @@
 
 ## 2026-05-11
 
+- Stage 3 discrete validation: knapsack-01 and 2×2 assignment toy scenarios (`discrete_benchmark_scenarios.py`), integration tests, and `make benchmark` extended; `optimize(..., rng_seed=)` threads into discrete/hybrid solver RNGs for reproducible CI.
+- PRD-0020 / VR-0020 / ADR-0019.
 - Stage 3 learning slice: discrete/hybrid runs persist `descriptor_learning_features` plus `optimizer_bandit_reward` (and hybrid inner strategy) in local memory JSON; explanations expose `adaptation.descriptor_learning`.
 - PRD-0019 / VR-0019 / ADR-0018; `ACTIVE_PLAN` candidate slice 4 marked integrated and Next 3 Slices rolled forward.
 - `ACTIVE_PLAN.md`: execution gate rewritten as linear Stage 2 → 3 → 4 (removed contradictory “Stage 3 after Stage 4” rule); noted early Stage 4 scaffolding vs current Stage 3 focus.

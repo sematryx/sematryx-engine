@@ -44,9 +44,9 @@ Candidate slices (status):
 
 ## Next 3 Slices
 
-1. Stage 3 validation slice: knapsack/scheduling-style benchmark scenarios for discrete paths.
-2. Stage 3 refinement slice: smarter hybrid outer search (optional Bayesian / staged budgets), gated by validation metrics.
-3. Stage 3 acceptance closure: discrete cold→warm selection evidence on validation scenarios (ties Stage 3 acceptance criterion 3).
+1. Stage 3 refinement slice: smarter hybrid outer search (optional Bayesian / staged budgets), gated by validation metrics.
+2. Stage 3 acceptance closure: discrete cold→warm selection evidence on validation scenarios (ties Stage 3 acceptance criterion 3).
+3. Optional: wire discrete validation rows into `generate_benchmark_trend_report.py` (debt until needed).
 
 ## Execution Order Gate (linear by stage number)
 
@@ -79,7 +79,7 @@ the same local-first learning loop and policy enforcement model.
 2. Solver slice: add baseline discrete solvers (random search + local neighborhood search). *(integrated)*
 3. Hybrid routing slice: route mixed-variable problems to compatible solver pipelines. *(integrated)*
 4. Learning slice: capture discrete-problem features and strategy rewards in local memory. *(integrated)*
-5. Validation slice: add benchmark scenarios for integer knapsack-like and scheduling-like cases.
+5. Validation slice: add benchmark scenarios for integer knapsack-like and scheduling-like cases. *(integrated: knapsack-01 + 2×2 assignment; `make benchmark` + integration tests)*
 
 ### Stage Acceptance Criteria
 
@@ -127,4 +127,4 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 
 ## Last Updated
 
-2026-05-11 — Stage 3 learning/memory slice integrated; execution gate remains linear 2 → 3 → 4.
+2026-05-11 — Stage 3 validation benchmarks integrated; `optimize(rng_seed=...)` for discrete/hybrid reproducibility; execution gate remains linear 2 → 3 → 4.
