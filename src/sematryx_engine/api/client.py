@@ -5,6 +5,7 @@ from sematryx_engine.api.variable_descriptors import (
     classify_descriptor_mix,
     descriptors_to_bounds,
     descriptors_to_encoded_bounds,
+    descriptors_to_mixed_encoded_bounds,
     normalize_variable_descriptors,
 )
 from sematryx_engine.engine.optimizer import run_optimization
@@ -22,8 +23,12 @@ def optimize(
         descriptors = normalize_variable_descriptors(variable_descriptors)
         mix = classify_descriptor_mix(descriptors)
         if mix == "mixed":
-            raise ValueError(
-                "Mixed continuous and discrete variables are not supported until Stage 3 hybrid routing."
+            return run_optimization(
+                objective_function=objective_function,
+                bounds=descriptors_to_mixed_encoded_bounds(descriptors),
+                max_evaluations=max_evaluations,
+                domain=domain,
+                hybrid_descriptors=descriptors,
             )
         if mix == "discrete_only":
             return run_optimization(

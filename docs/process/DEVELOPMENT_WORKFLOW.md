@@ -4,15 +4,16 @@ This repository follows a rigid, enforced workflow.
 
 ## Required Sequence
 
-1. Define outcome, constraints, and non-goals (PRD/issue scope)
-2. Create/update ADR for architecture-impacting decisions
-3. Implement in small vertical slices
-4. Add/update tests in the same slice
-5. Write verification report mapping PRD criteria to evidence
-6. Run quality + policy checks locally
-7. Open PR using the repository template
-8. Address review feedback
-9. Merge only when all checks are green
+1. Skim `docs/planning/ACTIVE_PLAN.md` for current slice ordering; adjust when priorities change (same PR when practical).
+2. Define outcome, constraints, and non-goals (PRD/issue scope)
+3. Create/update ADR for architecture-impacting decisions
+4. Implement in small vertical slices
+5. Add/update tests in the same slice
+6. Write verification report mapping PRD criteria to evidence
+7. Run quality + policy checks locally
+8. Open PR using the repository template
+9. Address review feedback
+10. Merge only when all checks are green
 
 ## Enforcement
 

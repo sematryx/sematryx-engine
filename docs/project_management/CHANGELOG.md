@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-05-10
+
+- Stage 3 hybrid routing: mixed `variable_descriptors` (continuous + integer/categorical) run `hybrid_outer_random_inner_scipy` (random discrete outer samples + inner continuous optimization); selector gains `exclude_strategies` so inner solves cannot pick discrete-only arms.
+- Added `descriptors_to_mixed_encoded_bounds`, `normalize_mixed_solution`, and `solvers/hybrid_solvers.py`.
+
 ## 2026-05-09
 
 - Stage 3 discrete solver baseline: discrete-only `variable_descriptors` (`integer` / `categorical`) optimize via `discrete_random_neighborhood` (random search + coordinate neighborhood refinement); mixed continuous + discrete still raises until hybrid routing slice.
