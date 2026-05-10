@@ -2,46 +2,51 @@
 
 ## Current Phase
 
-Stage 2: quality-to-release readiness.
+**Stage 3:** discrete optimizer track (see Next 3 Slices).
 
-## Stage Goal
+**Stage 2 is closed** (2026-05-11): acceptance criteria and explainability follow-up are satisfied;
+domain benchmarks and integration regression gates run under CI (`integration-performance` job).
+
+## Stage Goal (Stage 3 focus)
+
+Continue first-class discrete support (learning → validation → refinement) while preserving the
+local-first learning loop and policy model.
+
+## Stage 2 — Complete
+
+### Stage 2 Goal (achieved)
 
 Move from "working local engine with guardrails" to "measured, calibrated, and release-ready."
 
-## Stage Acceptance Criteria
+### Stage 2 Acceptance Criteria
 
-1. Domain benchmark scenarios exist and run in CI/local with reproducible outputs.
-2. Learning quality trend report is generated from benchmark runs.
-3. Strategy confidence/reward behavior is tuned with documented rationale.
-4. Release flow documents include status-check naming and multi-job CI guidance (done).
+1. **Domain benchmark scenarios** exist and run in **CI** and local with reproducible outputs — **done**
+   (`tests/performance`, `tests/integration` snapshot thresholds; CI job `integration-performance`).
+2. **Learning quality trend report** is generated from benchmark runs — **done**
+   (`scripts/generate_benchmark_trend_report.py`, `make report-benchmark`; PRD-0003).
+3. **Strategy confidence/reward** tuned with documented rationale — **done**
+   (ADR-0003, PRD-0004, calibration tests).
+4. **Release flow documents** include status-check naming and multi-job CI guidance — **done**
+   (`RELEASE_CHECKLIST.md`, `DEVELOPMENT_WORKFLOW.md`).
+
+### Stage 2 Follow-up: Explainability Components — Complete
+
+Track acceptance criteria are met: structured `explanation` on results, memory override confidence,
+deterministic test paths, and integration coverage (e.g. core-depth gate, explainability tests).
+
+Candidate slices (status):
+
+1. Explanation schema — *(integrated; PRD-0008 / ADR-0007)*  
+2. Decision trace — *(integrated via attempt traces, `selection_basis`, adaptation overlay; no separate export-only slice)*  
+3. Formatter helpers — *(integrated; PRD-0015)*  
+4. Explanation validation — *(integrated; integration tests + core-depth validation)*  
+5. Docs — *(integrated at `SYSTEM_OVERVIEW.md`, ADRs, PRDs; user-facing tutorial backlog is non-blocking)*  
 
 ## Next 3 Slices
 
 1. Stage 3 learning slice: discrete-problem features and reward capture in local memory.
 2. Stage 3 validation slice: knapsack/scheduling-style benchmark scenarios for discrete paths.
 3. Stage 3 refinement slice: smarter hybrid outer search (optional Bayesian / staged budgets), gated by validation metrics.
-
-## Stage 2 Follow-up: Explainability Components
-
-### Track Goal
-
-Produce stable, auditable explanations for strategy and solver decisions so users can
-understand "why this path was chosen" and compare behavior across cold vs warm runs.
-
-### Candidate Slices
-
-1. Explanation schema slice: define structured explanation payload in result model.
-2. Decision trace slice: capture selector and memory decision breadcrumbs in runtime.
-3. Formatter slice: add concise and verbose explanation rendering helpers.
-4. Explanation validation slice: add deterministic tests for explanation completeness.
-5. Docs slice: document explanation contract and examples for users.
-
-### Track Acceptance Criteria
-
-1. Result object includes structured explanation fields for selection rationale.
-2. Warm-history decisions expose memory evidence and confidence basis.
-3. Explanation output is deterministic for deterministic benchmark/test paths.
-4. Explanation behavior is covered by integration tests and verification artifacts.
 
 ## Execution Order Gate
 
@@ -120,4 +125,4 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 
 ## Last Updated
 
-2026-05-08
+2026-05-11

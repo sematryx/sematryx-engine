@@ -5,7 +5,7 @@ from pathlib import Path
 CHECKLIST_PATH = Path("docs/process/RELEASE_CHECKLIST.md")
 REQUIRED_ITEMS = [
     "`make all` passes",
-    "`pytest tests/integration` passes",
+    "`CI / required-checks` is green (includes `integration-performance`: `pytest tests/integration tests/performance --import-mode=importlib`)",
     "PRD and verification report are complete",
     "ADR updates merged for architecture changes",
     "CHANGELOG updated",
