@@ -48,21 +48,23 @@ Candidate slices (status):
 2. Stage 3 validation slice: knapsack/scheduling-style benchmark scenarios for discrete paths.
 3. Stage 3 refinement slice: smarter hybrid outer search (optional Bayesian / staged budgets), gated by validation metrics.
 
-## Execution Order Gate
+## Execution Order Gate (linear by stage number)
 
-Stage 4 begins only after Stage 2 benchmark-depth slices are complete: reporting (done),
-calibration (done), and objective-level benchmark evolution (done).
+Stages advance in order: **2 → 3 → 4**. Later stage work is not a prerequisite for earlier stage
+work.
 
-**Legacy continuous solver roster (non-discrete parity with the legacy tool)** is integrated during
-Stage 4—alongside topology-driven routing and adaptive workflow—not after Stage 3 discrete work.
-Rationale: the legacy roster matches today’s continuous problem model; discrete optimizers require
-typed variables, hybrid routing, and additional solvers. Bolting many continuous strategies on before
-routing discipline exists dilutes learning signal; expanding the roster once topology and selection
-can use richer signals matches the Stage 4 goal.
+1. **Stage 2** — Quality-to-release readiness (benchmarks in CI, calibration, reporting). **Closed.**
+2. **Stage 3** — Discrete optimizers: finish acceptance criteria (learning, validation, refinement
+   slices and discrete cold→warm evidence). **In progress.**
+3. **Stage 4** — Full core-depth **continuous** parity with the legacy tool (topology depth,
+   roster breadth, adaptive loop quality gates, etc.). **Treat remaining Stage 4 backlog as primary
+   only after Stage 3 acceptance criteria are met** (or document explicit ADR exception).
 
-Stage 3 discrete optimizers begin only after Stage 4 core-depth parity slices have established
-stable topology-driven routing, adaptive loops, and **legacy-continuous solver portfolio parity**
-(or an explicitly documented subset with INTEGRATION_DEBT for the remainder).
+**Historical note:** Some Stage 4-oriented scaffolding (topology artifact, tunneling, expanded
+continuous roster, autodidactic loop, priors, core-depth tests) landed while Stage 2 was still
+open. That does not redefine stage order: **Stage 3 discrete remains the current numbered focus
+until its acceptance criteria are satisfied;** remaining Stage 4 acceptance checks are then closed
+out against `main` deliberately in Stage 4 order.
 
 ## Stage 3 Preview: Discrete Optimizers
 
@@ -125,4 +127,4 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 
 ## Last Updated
 
-2026-05-11
+2026-05-11 (execution gate corrected to linear 2 → 3 → 4)
