@@ -283,6 +283,9 @@ def run_optimization(
         features=features,
         domain=domain,
         topology_artifact=topology_artifact.as_dict(),
+        exclude_strategies=frozenset(
+            {"discrete_random_neighborhood", "hybrid_outer_random_inner_scipy"}
+        ),
     )
     tuning_priors = compute_solver_tuning_priors(
         features=features,
