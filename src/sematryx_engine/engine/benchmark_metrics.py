@@ -2,12 +2,23 @@
 
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 from pathlib import Path
 
+from sematryx_engine.api.variable_descriptors import normalize_variable_descriptors
+from sematryx_engine.engine.discrete_benchmark_scenarios import (
+    assignment_2x2_penalty_objective,
+    assignment_2x2_specs,
+    assignment_2x2_variable_descriptors,
+    knapsack_01_penalty_objective,
+    knapsack_01_small_specs,
+    knapsack_01_variable_descriptors,
+)
 from sematryx_engine.engine.problem_features import extract_problem_features
 from sematryx_engine.engine.strategy_selector import StrategySelector
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
+from sematryx_engine.solvers.discrete_solvers import solve_discrete_baseline
 from sematryx_engine.solvers.strategy_dispatch import solve_with_strategy
 
 
@@ -74,7 +85,59 @@ def run_objective_benchmark_isolated(
     )
 
 
-def collect_objective_benchmark_snapshot(tmp_path: Path) -> dict[str, object]:
+def collect_discrete_objective_benchmark_snapshot() -> dict[str, dict[str, object]]:
+    """Isolated discrete solver runs matching Stage 3 validation scenario seeds."""
+
+    def row(obr: ObjectiveBenchmarkResult) -> dict[str, object]:
+        return {
+            "scenario_name": obr.scenario_name,
+            "best_value": obr.best_value,
+            "evaluations": obr.evaluations,
+            "strategy_used": obr.strategy_used,
+            "dimensions": obr.dimensions,
+            "domain": obr.domain,
+        }
+
+    weights, values, capacity, _opt_profit = knapsack_01_small_specs()
+    kn_desc = normalize_variable_descriptors(knapsack_01_variable_descriptors())
+    kn_obj = knapsack_01_penalty_objective(weights, values, capacity)
+    kn_res = solve_discrete_baseline(
+        kn_obj,
+        kn_desc,
+        max_evaluations=1800,
+        rng=random.Random(20260111),
+    )
+    kn_row = ObjectiveBenchmarkResult(
+        scenario_name="knapsack01",
+        best_value=float(kn_res.fun),
+        evaluations=int(getattr(kn_res, "nfev", 0)),
+        strategy_used="discrete_random_neighborhood",
+        dimensions=len(kn_desc),
+        domain="stage3_snapshot_knapsack01",
+    )
+
+    cost, _opt_cost = assignment_2x2_specs()
+    as_desc = normalize_variable_descriptors(assignment_2x2_variable_descriptors())
+    as_obj = assignment_2x2_penalty_objective(cost)
+    as_res = solve_discrete_baseline(
+        as_obj,
+        as_desc,
+        max_evaluations=900,
+        rng=random.Random(20260112),
+    )
+    as_row = ObjectiveBenchmarkResult(
+        scenario_name="assignment2x2",
+        best_value=float(as_res.fun),
+        evaluations=int(getattr(as_res, "nfev", 0)),
+        strategy_used="discrete_random_neighborhood",
+        dimensions=len(as_desc),
+        domain="stage3_snapshot_assignment2x2",
+    )
+
+    return {"knapsack01": row(kn_row), "assignment2x2": row(as_row)}
+
+
+def collect_objective_benchmark_snapshot(tmp_path: Path) -> dict[str, dict[str, object]]:
     """Runs reproducible sphere cases with isolated SQLite/bandit files."""
 
     def row(obr: ObjectiveBenchmarkResult) -> dict[str, object]:
@@ -106,7 +169,12 @@ def collect_objective_benchmark_snapshot(tmp_path: Path) -> dict[str, object]:
         objective_seed=103,
     )
 
-    return {"sphere_dim4": row(low), "sphere_dim8": row(mid)}
+    merged: dict[str, dict[str, object]] = {
+        "sphere_dim4": row(low),
+        "sphere_dim8": row(mid),
+    }
+    merged.update(collect_discrete_objective_benchmark_snapshot())
+    return merged
 
 
 def run_selection_benchmark(
@@ -165,10 +233,9 @@ def collect_domain_benchmark_snapshot(
     tmp_path: Path,
     rugged_runs: int = 100,
     high_dim_runs: int = 100,
+    discrete_selection_runs: int | None = None,
 ) -> dict[str, object]:
     """Run standard domain scenarios and return structured metrics for reporting."""
-    import random
-
     random.seed(21)
     rugged_cold = run_selection_benchmark(
         domain="rugged_search",
@@ -209,6 +276,47 @@ def collect_domain_benchmark_snapshot(
         memory_path=tmp_path / "hd_warm.db",
     )
 
+    druns = discrete_selection_runs if discrete_selection_runs is not None else rugged_runs
+    random.seed(41)
+    dk_cold = run_selection_benchmark(
+        domain="stage3_trend_knapsack01",
+        bounds=[(0.0, 1.0)] * 4,
+        max_evaluations=500,
+        warm_strategy=None,
+        warm_count=0,
+        runs=druns,
+        memory_path=tmp_path / "disc_knapsack_cold.db",
+    )
+    dk_warm = run_selection_benchmark(
+        domain="stage3_trend_knapsack01",
+        bounds=[(0.0, 1.0)] * 4,
+        max_evaluations=500,
+        warm_strategy="discrete_random_neighborhood",
+        warm_count=8,
+        runs=druns,
+        memory_path=tmp_path / "disc_knapsack_warm.db",
+    )
+
+    random.seed(43)
+    da_cold = run_selection_benchmark(
+        domain="stage3_trend_assignment2x2",
+        bounds=[(0.0, 1.0)] * 2,
+        max_evaluations=400,
+        warm_strategy=None,
+        warm_count=0,
+        runs=druns,
+        memory_path=tmp_path / "disc_assign_cold.db",
+    )
+    da_warm = run_selection_benchmark(
+        domain="stage3_trend_assignment2x2",
+        bounds=[(0.0, 1.0)] * 2,
+        max_evaluations=400,
+        warm_strategy="discrete_random_neighborhood",
+        warm_count=8,
+        runs=druns,
+        memory_path=tmp_path / "disc_assign_warm.db",
+    )
+
     def row(r: SelectionBenchmarkResult) -> dict[str, object]:
         return {
             "domain": r.domain,
@@ -224,6 +332,8 @@ def collect_domain_benchmark_snapshot(
         "scenarios": {
             "rugged_search": {"cold": row(rugged_cold), "warm": row(rugged_warm)},
             "high_dimensional": {"cold": row(hd_cold), "warm": row(hd_warm)},
+            "discrete_knapsack": {"cold": row(dk_cold), "warm": row(dk_warm)},
+            "discrete_assignment2x2": {"cold": row(da_cold), "warm": row(da_warm)},
         },
         "objectives": collect_objective_benchmark_snapshot(tmp_path),
     }

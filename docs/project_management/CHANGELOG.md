@@ -2,6 +2,7 @@
 
 ## 2026-05-11
 
+- Stage 3 acceptance closure: `benchmark_metrics` adds discrete knapsack/assignment cold→warm selection scenarios + seeded discrete objective rows; trend report renders all scenario/objective keys; `test_stage3_discrete_cold_warm_selection`. PRD-0023 / VR-0023 / ADR-0022.
 - Stage 3 hybrid outer refinement: after random discrete shells, coordinate neighborhood refinement with staged inner SciPy budgets; public `discrete_coordinate_neighbors`; hybrid `OptimizeResult.message` `hybrid_outer_random_inner_scipy_refined`. PRD-0022 / VR-0022 / ADR-0021.
 - Continuous-only `run_optimization` excludes discrete/hybrid strategy IDs from bandit selection so fresh CI environments cannot route bounds-only problems through `hybrid_outer_random_inner_scipy`. PRD-0021 / VR-0021 / ADR-0020; integration regression `test_continuous_bandit_excludes_hybrid_strategies`.
 - Stage 3 discrete validation: knapsack-01 and 2×2 assignment toy scenarios (`discrete_benchmark_scenarios.py`), integration tests, and `make benchmark` extended; `optimize(..., rng_seed=)` threads into discrete/hybrid solver RNGs for reproducible CI.

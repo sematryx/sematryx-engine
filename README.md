@@ -70,7 +70,8 @@ inner solves keep their own seeds).
 Bounds-only continuous runs automatically exclude discrete/hybrid strategy arms from bandit
 selection (those strategies require `variable_descriptors`).
 
-Snapshots include selection scenarios plus isolated scipy sphere runs (`version` 2, `objectives` section).
+Snapshots include selection scenarios (continuous + discrete-shaped cold/warm), sphere objectives,
+and seeded discrete validation objectives (`version` 2, `objectives` section).
 
 ```python
 from sematryx_engine import optimize
