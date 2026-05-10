@@ -104,6 +104,15 @@ def _coordinate_neighbors(
     return neighbors
 
 
+def discrete_coordinate_neighbors(
+    current: Sequence[float],
+    descriptors: list[VariableDescriptor],
+    dim_index: int,
+) -> list[list[float]]:
+    """Single-coordinate neighbor assignments for discrete variables (integers and categoricals)."""
+    return _coordinate_neighbors(list(current), descriptors, dim_index)
+
+
 def solve_discrete_baseline(
     objective_function: Callable[[list[float]], float],
     descriptors: list[VariableDescriptor],

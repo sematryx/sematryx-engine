@@ -21,6 +21,7 @@
 - `ADR-0018-stage3-discrete-learning-memory.md` - Descriptor learning features in memory + explanations
 - `ADR-0019-stage3-discrete-validation-benchmarks.md` - Discrete validation scenarios + rng_seed
 - `ADR-0020-continuous-bandit-strategy-exclusions.md` - Bounds-only runs exclude discrete/hybrid bandit arms
+- `ADR-0021-stage3-hybrid-outer-refinement.md` - Hybrid outer exploration + discrete neighborhood refinement
 
 Add ADR files here using a monotonic sequence, for example:
 
@@ -44,3 +45,4 @@ Add ADR files here using a monotonic sequence, for example:
 - `ADR-0018-stage3-discrete-learning-memory.md`
 - `ADR-0019-stage3-discrete-validation-benchmarks.md`
 - `ADR-0020-continuous-bandit-strategy-exclusions.md`
+- `ADR-0021-stage3-hybrid-outer-refinement.md`

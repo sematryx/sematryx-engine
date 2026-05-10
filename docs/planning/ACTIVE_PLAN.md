@@ -44,9 +44,9 @@ Candidate slices (status):
 
 ## Next 3 Slices
 
-1. Stage 3 refinement slice: smarter hybrid outer search (optional Bayesian / staged budgets), gated by validation metrics.
-2. Stage 3 acceptance closure: discrete cold→warm selection evidence on validation scenarios (ties Stage 3 acceptance criterion 3).
-3. Optional: wire discrete validation rows into `generate_benchmark_trend_report.py` (debt until needed).
+1. Stage 3 acceptance closure: discrete cold→warm selection evidence on validation scenarios (ties Stage 3 acceptance criterion 3).
+2. Optional: wire discrete validation rows into `generate_benchmark_trend_report.py` (debt until needed).
+3. Optional follow-up: Bayesian / acquisition-function hybrid outer loop beyond neighborhood refinement.
 
 ## Execution Order Gate (linear by stage number)
 
@@ -127,4 +127,4 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 
 ## Last Updated
 
-2026-05-11 — Continuous bounds-only bandit excludes discrete/hybrid arms (CI regression guard); Stage 3 validation benchmarks integrated; `optimize(rng_seed=...)` for discrete/hybrid reproducibility; execution gate remains linear 2 → 3 → 4.
+2026-05-11 — Stage 3 hybrid outer refinement (random exploration + discrete neighborhood refinement, staged inner budgets; ADR-0021 / PRD-0022 / VR-0022). Continuous bounds-only bandit excludes discrete/hybrid arms; validation benchmarks + `rng_seed` integrated; execution gate remains linear 2 → 3 → 4.
