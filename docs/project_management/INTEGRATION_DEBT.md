@@ -2,9 +2,10 @@
 
 ## Current Deferred Items
 
-- Selector/memory recommendations remain domain-keyed only; using stored `descriptor_learning_features`
-  to bucket or rank discrete-shaped histories is deferred.
-- Hybrid **outer** loop: neighborhood refinement + staged inner budgets are integrated (ADR-0021); acquisition/Bayesian outer sampling and tighter global outer/inner budgeting heuristics remain deferred.
+- Continuous-path strategy recommendations remain domain-keyed only; richer bucketing on full
+  `descriptor_learning_features` (beyond `descriptor_mix` on hybrid inner selection) is deferred.
+- Hybrid **outer** loop: LCB acquisition + neighborhood refinement + staged budgets are integrated
+  (ADR-0021, ADR-0023). Full GP / Thompson outer surrogates remain deferred.
 - Optional adapters for non-local backends (kept out of v1 core path).
 - Expanded solver portfolio parity vs legacy project.
 - Non-SciPy legacy continuous backends require optional package installation; calibration depth remains deferred.

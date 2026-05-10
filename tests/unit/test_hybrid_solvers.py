@@ -33,7 +33,7 @@ def test_hybrid_outer_refinement_reaches_mixed_optimum() -> None:
         tuning_priors={},
         rng=random.Random(42),
     )
-    assert result.message == "hybrid_outer_random_inner_scipy_refined"
+    assert result.message == "hybrid_outer_acquisition_lcb_inner_scipy_refined"
     assert result.success is True
     assert float(result.fun) < 0.05
     assert abs(result.x[0] - 0.5) < 0.15

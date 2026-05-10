@@ -63,12 +63,15 @@ class StrategySelector:
         domain: str,
         topology_artifact: dict[str, object] | None = None,
         deterministic_bandit: bool = False,
+        *,
+        memory_descriptor_mix: str | None = None,
     ) -> tuple[str, float]:
         strategy, confidence, _basis = self.select_with_basis(
             features=features,
             domain=domain,
             topology_artifact=topology_artifact,
             deterministic_bandit=deterministic_bandit,
+            memory_descriptor_mix=memory_descriptor_mix,
         )
         return strategy, confidence
 
@@ -80,6 +83,7 @@ class StrategySelector:
         topology_artifact: dict[str, object] | None = None,
         deterministic_bandit: bool = False,
         exclude_strategies: frozenset[str] | None = None,
+        memory_descriptor_mix: str | None = None,
     ) -> tuple[str, float, str]:
         excluded = exclude_strategies or frozenset()
         # Keep strategy filtering deterministic and simple in v1.
@@ -92,7 +96,11 @@ class StrategySelector:
         candidates = [c for c in candidates if c not in excluded]
 
         # Domain recommendations can override cold-start when evidence is strong.
-        recommendations = self._memory.get_strategy_recommendations(domain=domain, limit=2)
+        recommendations = self._memory.get_strategy_recommendations(
+            domain=domain,
+            limit=2,
+            descriptor_mix=memory_descriptor_mix,
+        )
         if recommendations:
             top = recommendations[0]
             # Use deterministic memory override only with enough historical evidence.

@@ -107,6 +107,7 @@ def run_optimization(
             exclude_strategies=frozenset(
                 {"discrete_random_neighborhood", "hybrid_outer_random_inner_scipy"}
             ),
+            memory_descriptor_mix="mixed",
         )
         strategy_name = "hybrid_outer_random_inner_scipy"
         selection_basis = "hybrid_problem_shape"
