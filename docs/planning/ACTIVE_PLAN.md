@@ -53,6 +53,14 @@ Candidate slices (status):
 2. Stage 4 legacy continuous roster: close parity gaps called out in subsystem docs / debt register.
 3. Stage 4 autodidactic loop: measurable improvements on expanded benchmark classes (ties Stage 4 acceptance criterion 5).
 
+## Deferred optional engine work
+
+Not Stage 4 gates; tracked so it is not dropped.
+
+- **Hybrid outer — full Bayesian / GP / Thompson discrete-shell search:** deferred (current outer uses
+  LCB-style shell statistics). See **ADR-0023 § Alternatives** and **`INTEGRATION_DEBT.md`** (hybrid
+  outer surrogate row).
+
 ## Execution Order Gate (linear by stage number)
 
 Stages advance in order: **2 → 3 → 4**. Later stage work is not a prerequisite for earlier stage
@@ -136,3 +144,5 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 ## Last Updated
 
 2026-05-11 — Stage 3 optional closure (ADR-0023): hybrid LCB acquisition outer loop + descriptor_mix SQLite memory filter + hybrid inner wiring; ACTIVE_PLAN Stage 4 primary; stale gate paragraph corrected. Prior: acceptance closure + hybrid refinement + validation + bandit guard.
+
+2026-05-12 — Full Bayesian / GP / Thompson hybrid **outer** loop explicitly listed under Deferred optional engine work and expanded in `INTEGRATION_DEBT.md`.

@@ -4,8 +4,11 @@
 
 - Continuous-path strategy recommendations remain domain-keyed only; richer bucketing on full
   `descriptor_learning_features` (beyond `descriptor_mix` on hybrid inner selection) is deferred.
-- Hybrid **outer** loop: LCB acquisition + neighborhood refinement + staged budgets are integrated
-  (ADR-0021, ADR-0023). Full GP / Thompson outer surrogates remain deferred.
+- Hybrid **outer** loop (mixed variables in `sematryx_engine`): LCB acquisition + neighborhood
+  refinement + staged budgets are integrated (ADR-0021, ADR-0023). **Full Bayesian / Gaussian-process /
+  Thompson sampling** (or equivalent principled BO) over **discrete shells** in that outer loop
+  remains **deferred** — optional dependencies, calibration, and heterogeneous inner SciPy noise (ADR-0023
+  § Alternatives). Revisit when outer evaluations are the dominant cost and benchmarks justify it.
 - Optional adapters for non-local backends (kept out of v1 core path).
 - Expanded solver portfolio parity vs legacy project.
 - Non-SciPy legacy continuous backends require optional package installation; calibration depth remains deferred.
