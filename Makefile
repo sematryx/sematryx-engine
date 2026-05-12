@@ -1,4 +1,4 @@
-.PHONY: install lint typecheck test smoke benchmark report-benchmark policy all
+.PHONY: install lint typecheck test smoke benchmark report-benchmark ablation ablation-full policy all
 
 install:
 	.venv311/bin/python -m pip install -e ".[dev]"
@@ -20,6 +20,12 @@ benchmark:
 
 report-benchmark:
 	.venv311/bin/python scripts/generate_benchmark_trend_report.py
+
+ablation:
+	.venv311/bin/python scripts/generate_ablation_report.py --mode light
+
+ablation-full:
+	.venv311/bin/python scripts/generate_ablation_report.py --mode heavy
 
 policy:
 	.venv311/bin/python scripts/check_forbidden_imports.py
