@@ -49,9 +49,15 @@ Candidate slices (status):
 
 ## Next 3 Slices
 
-1. Stage 4 topology–solver integration: deepen Physarum tunneling + routing evidence beyond scaffolding.
+1. Stage 4 topology–solver integration: **reshape per pre-Stage-4 ablation baseline**
+   (`docs/process/verification/baselines/FINDINGS-pre-stage-4-ablation.md`). The current
+   `topology_routing` override shows zero measurable effect on any scenario in the baseline,
+   so Slice 1 must first construct a scenario where topology routing measurably helps before
+   any deepening work. Use `make ablation` as the regression gate.
 2. Stage 4 legacy continuous roster: close parity gaps called out in subsystem docs / debt register.
-3. Stage 4 autodidactic loop: measurable improvements on expanded benchmark classes (ties Stage 4 acceptance criterion 5).
+3. Stage 4 autodidactic loop: measurable improvements on expanded benchmark classes (ties Stage 4
+   acceptance criterion 5). Baseline confirms `autodidactic_loop` already helps on rugged
+   multimodal (Δ=+100% when off, p<0.001); expansion targets are new problem classes.
 
 ## Deferred optional engine work
 
@@ -146,3 +152,8 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 2026-05-11 — Stage 3 optional closure (ADR-0023): hybrid LCB acquisition outer loop + descriptor_mix SQLite memory filter + hybrid inner wiring; ACTIVE_PLAN Stage 4 primary; stale gate paragraph corrected. Prior: acceptance closure + hybrid refinement + validation + bandit guard.
 
 2026-05-12 — Full Bayesian / GP / Thompson hybrid **outer** loop explicitly listed under Deferred optional engine work and expanded in `INTEGRATION_DEBT.md`.
+
+2026-05-12 — Pre-Stage-4 ablation baseline (PRD-0025 / ADR-0024) committed under
+`docs/process/verification/baselines/`. Findings: `autodidactic_loop` and `tuning_priors` are
+statistically significant helpers; `topology_routing` shows zero measurable effect on every
+scenario. Slice 1 scope reshaped — scenario design before deepening.
