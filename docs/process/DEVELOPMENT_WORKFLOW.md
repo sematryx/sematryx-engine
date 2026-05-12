@@ -68,3 +68,19 @@ align the protected branch’s required check name in GitHub settings.
 .venv311/bin/python scripts/check_forbidden_imports.py
 .venv311/bin/python scripts/check_policy.py
 ```
+
+## Ablation Harness
+
+The ablation harness (PRD-0025 / ADR-0024) toggles each integrated optimizer feature to a
+documented neutral fallback and emits a JSON + Markdown verdict report per
+(scenario, knob). It is the measurement path for Stage 4 acceptance criteria 2 and 5 and
+the standard tool for any future feature slice that claims to improve outcomes.
+
+```bash
+make ablation          # light matrix: 4 scenarios × 8 knobs × 20 seeds (~3 min)
+make ablation-full     # heavy matrix: N=100 seeds (~15 min, on-demand)
+```
+
+Reports land under `docs/process/verification/ablation/`. The `light` matrix is
+informational (not a merge gate). The `heavy` matrix underlies the pre-Stage-4 baseline
+and any future slice-close evidence.

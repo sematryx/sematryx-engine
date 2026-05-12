@@ -17,6 +17,13 @@
 - Rich markdown/HTML explanation renderers are deferred; lightweight concise/verbose string helpers are now available.
 - Longitudinal benchmark trend storage beyond generated snapshot files.
 - Alternative reward transforms (e.g. log-scale) deferred pending analysis against objective snapshot metrics.
+- **Ablation harness memory warmup:** the matrix runner isolates `_MEMORY` / `_SELECTOR` per cell
+  (deliberate, prevents seed-ordering contamination), so the `memory_override` and
+  `descriptor_mix_memory` knobs cannot trigger on cold-start cells — they require
+  `usage_count >= 3` in the same domain. The current default scenarios therefore read as
+  `no effect` for those two knobs even when the features may help in production. Followup: add an
+  optional per-scenario warmup phase that seeds N prior runs into memory before measurement.
+  See `engine/ablation_benchmark.py` docstring (PRD-0025 / ADR-0024).
 
 ## Policy
 
