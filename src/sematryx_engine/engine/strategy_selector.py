@@ -1,5 +1,7 @@
+import random
 from pathlib import Path
 
+from sematryx_engine.engine.ablation import AblationConfig, coerce
 from sematryx_engine.engine.problem_features import ProblemFeatures
 from sematryx_engine.learning.bandit import StrategyBandit
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
@@ -65,6 +67,7 @@ class StrategySelector:
         deterministic_bandit: bool = False,
         *,
         memory_descriptor_mix: str | None = None,
+        ablation: AblationConfig | None = None,
     ) -> tuple[str, float]:
         strategy, confidence, _basis = self.select_with_basis(
             features=features,
@@ -72,6 +75,7 @@ class StrategySelector:
             topology_artifact=topology_artifact,
             deterministic_bandit=deterministic_bandit,
             memory_descriptor_mix=memory_descriptor_mix,
+            ablation=ablation,
         )
         return strategy, confidence
 
@@ -84,7 +88,9 @@ class StrategySelector:
         deterministic_bandit: bool = False,
         exclude_strategies: frozenset[str] | None = None,
         memory_descriptor_mix: str | None = None,
+        ablation: AblationConfig | None = None,
     ) -> tuple[str, float, str]:
+        ab = coerce(ablation)
         excluded = exclude_strategies or frozenset()
         # Keep strategy filtering deterministic and simple in v1.
         if features.dimensions > 12:
@@ -96,22 +102,26 @@ class StrategySelector:
         candidates = [c for c in candidates if c not in excluded]
 
         # Domain recommendations can override cold-start when evidence is strong.
-        recommendations = self._memory.get_strategy_recommendations(
-            domain=domain,
-            limit=2,
-            descriptor_mix=memory_descriptor_mix,
-        )
-        if recommendations:
-            top = recommendations[0]
-            # Use deterministic memory override only with enough historical evidence.
-            if top.usage_count >= 3 and top.strategy_name not in excluded:
-                return top.strategy_name, memory_override_confidence(top.usage_count), "memory_override"
+        if ab.memory_override:
+            recommendations = self._memory.get_strategy_recommendations(
+                domain=domain,
+                limit=2,
+                descriptor_mix=memory_descriptor_mix if ab.descriptor_mix_memory else None,
+            )
+            if recommendations:
+                top = recommendations[0]
+                # Use deterministic memory override only with enough historical evidence.
+                if top.usage_count >= 3 and top.strategy_name not in excluded:
+                    return top.strategy_name, memory_override_confidence(top.usage_count), "memory_override"
+        else:
+            recommendations = []
 
-        tunneling_choice = _topology_tunneling_override(topology_artifact)
-        if tunneling_choice is not None:
-            strategy, confidence = tunneling_choice
-            if strategy not in excluded:
-                return strategy, confidence, "physarum_tunneling_override"
+        if ab.topology_routing:
+            tunneling_choice = _topology_tunneling_override(topology_artifact)
+            if tunneling_choice is not None:
+                strategy, confidence = tunneling_choice
+                if strategy not in excluded:
+                    return strategy, confidence, "physarum_tunneling_override"
 
         for rec in recommendations:
             if (
@@ -124,8 +134,11 @@ class StrategySelector:
         if not candidates:
             candidates = ["scipy_de"]
 
-        strategy, confidence = self._bandit.select(candidates, deterministic=deterministic_bandit)
-        return strategy, confidence, "bandit"
+        if ab.continuous_bandit:
+            strategy, confidence = self._bandit.select(candidates, deterministic=deterministic_bandit)
+            return strategy, confidence, "bandit"
+        chosen = random.choice(sorted(candidates))
+        return chosen, 0.5, "uniform_random_strategy"
 
     def update(self, strategy_name: str, reward: float) -> None:
         self._bandit.update(strategy_name, reward)
