@@ -5,6 +5,23 @@ from __future__ import annotations
 from sematryx_engine.engine.problem_features import ProblemFeatures
 
 
+def neutral_tuning_priors() -> dict[str, object]:
+    """Topology- and domain-blind defaults used when the tuning-priors ablation is off.
+
+    Matches the pre-feature historical behaviour: unit multipliers, polish enabled, the
+    existing tight-regime restart ratio, and unit SHGO scale. Version pinned to the same
+    schema as ``compute_solver_tuning_priors`` so downstream consumers do not branch.
+    """
+    return {
+        "version": 1,
+        "budget_multiplier": 1.0,
+        "de_polish": True,
+        "de_population_scale": 1.0,
+        "dual_annealing_restart_temp_ratio": 2e-5,
+        "shgo_sampling_scale": 1.0,
+    }
+
+
 def domain_budget_anchor(domain: str) -> float:
     """Stable multiplier in ``[0.93, 1.07]`` derived from the domain label."""
     if not domain.strip():

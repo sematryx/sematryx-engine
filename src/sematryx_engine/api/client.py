@@ -8,6 +8,7 @@ from sematryx_engine.api.variable_descriptors import (
     descriptors_to_mixed_encoded_bounds,
     normalize_variable_descriptors,
 )
+from sematryx_engine.engine.ablation import AblationConfig
 from sematryx_engine.engine.optimizer import run_optimization
 
 
@@ -19,6 +20,7 @@ def optimize(
     max_evaluations: int = 1000,
     domain: str = "general",
     rng_seed: int | None = None,
+    ablation: AblationConfig | None = None,
 ) -> OptimizationResult:
     if variable_descriptors is not None:
         descriptors = normalize_variable_descriptors(variable_descriptors)
@@ -31,6 +33,7 @@ def optimize(
                 domain=domain,
                 hybrid_descriptors=descriptors,
                 rng_seed=rng_seed,
+                ablation=ablation,
             )
         if mix == "discrete_only":
             return run_optimization(
@@ -40,6 +43,7 @@ def optimize(
                 domain=domain,
                 discrete_descriptors=descriptors,
                 rng_seed=rng_seed,
+                ablation=ablation,
             )
         effective_bounds = descriptors_to_bounds(descriptors)
     elif bounds is not None:
@@ -53,4 +57,5 @@ def optimize(
         max_evaluations=max_evaluations,
         domain=domain,
         rng_seed=rng_seed,
+        ablation=ablation,
     )

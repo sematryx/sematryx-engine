@@ -8,10 +8,11 @@ from sematryx_engine.api.variable_descriptors import (
     VariableDescriptor,
     descriptor_learning_features,
 )
+from sematryx_engine.engine.ablation import AblationConfig, coerce
 from sematryx_engine.engine.problem_features import ProblemFeatures, extract_problem_features
 from sematryx_engine.engine.strategy_selector import StrategySelector
 from sematryx_engine.engine.topology import build_topology_artifact
-from sematryx_engine.engine.tuning_priors import compute_solver_tuning_priors
+from sematryx_engine.engine.tuning_priors import compute_solver_tuning_priors, neutral_tuning_priors
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
 from sematryx_engine.solvers.discrete_solvers import solve_discrete_baseline
 from sematryx_engine.solvers.hybrid_solvers import (
@@ -79,6 +80,7 @@ def run_optimization(
     discrete_descriptors: list[VariableDescriptor] | None = None,
     hybrid_descriptors: list[VariableDescriptor] | None = None,
     rng_seed: int | None = None,
+    ablation: AblationConfig | None = None,
 ) -> OptimizationResult:
     if discrete_descriptors is not None and hybrid_descriptors is not None:
         raise ValueError("Cannot pass both discrete_descriptors and hybrid_descriptors.")
@@ -88,6 +90,8 @@ def run_optimization(
 
     if discrete_descriptors is not None and len(bounds) != len(discrete_descriptors):
         raise ValueError("bounds length must match discrete_descriptors length.")
+
+    ab = coerce(ablation)
 
     if hybrid_descriptors is not None:
         features = extract_problem_features(bounds=bounds, max_evaluations=max_evaluations)
@@ -108,15 +112,20 @@ def run_optimization(
                 {"discrete_random_neighborhood", "hybrid_outer_random_inner_scipy"}
             ),
             memory_descriptor_mix="mixed",
+            ablation=ab,
         )
         strategy_name = "hybrid_outer_random_inner_scipy"
         selection_basis = "hybrid_problem_shape"
         selection_confidence = 1.0
-        tuning_priors = compute_solver_tuning_priors(
-            features=features,
-            topology_budget_regime=topology_artifact.budget_regime,
-            tunneling_directive=topology_artifact.tunneling_directive,
-            domain=domain,
+        tuning_priors = (
+            compute_solver_tuning_priors(
+                features=features,
+                topology_budget_regime=topology_artifact.budget_regime,
+                tunneling_directive=topology_artifact.tunneling_directive,
+                domain=domain,
+            )
+            if ab.tuning_priors
+            else neutral_tuning_priors()
         )
         scipy_result = solve_hybrid_outer_random_inner_scipy(
             objective_function=objective_function,
@@ -125,6 +134,7 @@ def run_optimization(
             inner_strategy=inner_strategy,
             tuning_priors=tuning_priors,
             rng=random.Random(rng_seed) if rng_seed is not None else None,
+            ablation=ab,
         )
         best_value = float(scipy_result.fun)
         reward = min(1.0, 1.0 / (1.0 + sqrt(max(0.0, best_value))))
@@ -201,11 +211,15 @@ def run_optimization(
         strategy_name = "discrete_random_neighborhood"
         selection_basis = "discrete_problem_shape"
         selection_confidence = 1.0
-        tuning_priors = compute_solver_tuning_priors(
-            features=features,
-            topology_budget_regime=topology_artifact.budget_regime,
-            tunneling_directive=topology_artifact.tunneling_directive,
-            domain=domain,
+        tuning_priors = (
+            compute_solver_tuning_priors(
+                features=features,
+                topology_budget_regime=topology_artifact.budget_regime,
+                tunneling_directive=topology_artifact.tunneling_directive,
+                domain=domain,
+            )
+            if ab.tuning_priors
+            else neutral_tuning_priors()
         )
         scipy_result = solve_discrete_baseline(
             objective_function=objective_function,
@@ -287,16 +301,25 @@ def run_optimization(
         exclude_strategies=frozenset(
             {"discrete_random_neighborhood", "hybrid_outer_random_inner_scipy"}
         ),
+        ablation=ab,
     )
-    tuning_priors = compute_solver_tuning_priors(
-        features=features,
-        topology_budget_regime=topology_artifact.budget_regime,
-        tunneling_directive=topology_artifact.tunneling_directive,
-        domain=domain,
+    tuning_priors = (
+        compute_solver_tuning_priors(
+            features=features,
+            topology_budget_regime=topology_artifact.budget_regime,
+            tunneling_directive=topology_artifact.tunneling_directive,
+            domain=domain,
+        )
+        if ab.tuning_priors
+        else neutral_tuning_priors()
     )
-    attempt_limit = _attempt_budget(
-        max_evaluations=max_evaluations,
-        topology_budget_regime=topology_artifact.budget_regime,
+    attempt_limit = (
+        _attempt_budget(
+            max_evaluations=max_evaluations,
+            topology_budget_regime=topology_artifact.budget_regime,
+        )
+        if ab.autodidactic_loop
+        else 1
     )
     per_attempt_budget = max(20, max_evaluations // attempt_limit)
     raw_budget_multiplier = tuning_priors["budget_multiplier"]

@@ -13,6 +13,7 @@ from sematryx_engine.api.variable_descriptors import (
     VariableDescriptor,
     normalize_mixed_solution,
 )
+from sematryx_engine.engine.ablation import AblationConfig, coerce
 from sematryx_engine.solvers.discrete_solvers import (
     discrete_coordinate_neighbors,
     normalize_discrete_solution,
@@ -106,6 +107,7 @@ def solve_hybrid_outer_random_inner_scipy(
     inner_strategy: str,
     tuning_priors: dict[str, object] | None,
     rng: random.Random | None = None,
+    ablation: AblationConfig | None = None,
 ) -> OptimizeResult:
     """Outer discrete search with LCB-style acquisition + inner SciPy per shell.
 
@@ -115,6 +117,7 @@ def solve_hybrid_outer_random_inner_scipy(
     """
     if max_evaluations < 2:
         raise ValueError("hybrid solver requires max_evaluations >= 2.")
+    ab = coerce(ablation)
     disc_desc = discrete_descriptors_only(descriptors)
     cont_bounds = continuous_bounds_only(descriptors)
     if not disc_desc:
@@ -193,10 +196,13 @@ def solve_hybrid_outer_random_inner_scipy(
                 continue
             pool_keys.append(kt)
 
-        chosen = min(
-            pool_keys,
-            key=lambda k: _lcb_acquire_score(k, shell_stats, outer_t, best_fun),
-        )
+        if ab.hybrid_outer_acquisition:
+            chosen = min(
+                pool_keys,
+                key=lambda k: _lcb_acquire_score(k, shell_stats, outer_t, best_fun),
+            )
+        else:
+            chosen = local_rng.choice(pool_keys)
         remaining = max_evaluations - total_nfev
         if remaining < 2:
             break
@@ -219,41 +225,48 @@ def solve_hybrid_outer_random_inner_scipy(
 
     assert best_x is not None and best_disc_norm is not None
 
-    improved = True
-    while total_nfev < max_evaluations - 1 and improved:
-        improved = False
-        nbr_candidates: list[tuple[float, ...]] = []
-        for dim in range(len(disc_desc)):
-            for nbr in discrete_coordinate_neighbors(best_disc_norm, disc_desc, dim):
-                nn = normalize_discrete_solution(nbr, disc_desc)
-                kt = tuple(nn)
-                if kt not in seen_disc and kt not in nbr_candidates:
-                    nbr_candidates.append(kt)
+    if ab.hybrid_outer_refinement:
+        improved = True
+        while total_nfev < max_evaluations - 1 and improved:
+            improved = False
+            nbr_candidates: list[tuple[float, ...]] = []
+            for dim in range(len(disc_desc)):
+                for nbr in discrete_coordinate_neighbors(best_disc_norm, disc_desc, dim):
+                    nn = normalize_discrete_solution(nbr, disc_desc)
+                    kt = tuple(nn)
+                    if kt not in seen_disc and kt not in nbr_candidates:
+                        nbr_candidates.append(kt)
 
-        nbr_candidates.sort(
-            key=lambda k: _lcb_acquire_score(k, shell_stats, outer_t, best_fun),
-        )
+            nbr_candidates.sort(
+                key=lambda k: _lcb_acquire_score(k, shell_stats, outer_t, best_fun),
+            )
 
-        for chosen in nbr_candidates:
-            if total_nfev >= max_evaluations:
-                break
-            remaining = max_evaluations - total_nfev
-            if remaining < 2:
-                break
-            inner_budget = _inner_budget_refine(remaining)
-            inner_budget = min(inner_budget, remaining)
-            prev_best = best_fun
-            run_inner(list(chosen), inner_budget)
-            if best_fun < prev_best - 1e-15:
-                improved = True
-                break
+            for chosen in nbr_candidates:
+                if total_nfev >= max_evaluations:
+                    break
+                remaining = max_evaluations - total_nfev
+                if remaining < 2:
+                    break
+                inner_budget = _inner_budget_refine(remaining)
+                inner_budget = min(inner_budget, remaining)
+                prev_best = best_fun
+                run_inner(list(chosen), inner_budget)
+                if best_fun < prev_best - 1e-15:
+                    improved = True
+                    break
 
     assert best_x is not None
+    if ab.is_default():
+        message = "hybrid_outer_acquisition_lcb_inner_scipy_refined"
+    else:
+        acq = "lcb" if ab.hybrid_outer_acquisition else "uniform"
+        ref = "refined" if ab.hybrid_outer_refinement else "no_refine"
+        message = f"hybrid_outer_{acq}_inner_scipy_{ref}"
     return OptimizeResult(
         x=list(best_x),
         fun=float(best_fun),
         nfev=total_nfev,
         nit=outer_iterations,
         success=math.isfinite(best_fun),
-        message="hybrid_outer_acquisition_lcb_inner_scipy_refined",
+        message=message,
     )
