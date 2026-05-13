@@ -59,31 +59,31 @@ deepening features that do not earn their complexity in Slice 1 onward.
 
 ## Acceptance Criteria (Checklist)
 
-- [ ] `AblationConfig` dataclass exists with the eight knobs above and a `default()` classmethod.
-- [ ] `optimize(...)` accepts `ablation` kwarg without altering default-path results
+- [x] `AblationConfig` dataclass exists with the eight knobs above and a `default()` classmethod.
+- [x] `optimize(...)` accepts `ablation` kwarg without altering default-path results
       (byte-identity test on at least 3 scenarios × 3 seeds).
-- [ ] Each neutral fallback has a unit test that proves the off-path is deterministic and
+- [x] Each neutral fallback has a unit test that proves the off-path is deterministic and
       independent of the integrated path.
-- [ ] `run_ablation_matrix` returns a structured result usable by the report generator and
+- [x] `run_ablation_matrix` returns a structured result usable by the report generator and
       runs the light matrix in under 2 minutes on devbox.
-- [ ] `scripts/generate_ablation_report.py` produces a JSON + Markdown report with the
+- [x] `scripts/generate_ablation_report.py` produces a JSON + Markdown report with the
       verdict column populated per ADR-0024 rule.
-- [ ] `make ablation` and `make ablation-full` exist and are documented in `DEVELOPMENT_WORKFLOW.md`.
-- [ ] Pre-Stage-4 baseline report is committed; `ACTIVE_PLAN` Stage 4 preview notes the baseline.
-- [ ] ADR-0024 records the ablation boundary, fallback semantics, and verdict thresholds.
-- [ ] VR-0025 documents byte-identity evidence, light-matrix runtime, and a snapshot of the
+- [x] `make ablation` and `make ablation-full` exist and are documented in `DEVELOPMENT_WORKFLOW.md`.
+- [x] Pre-Stage-4 baseline report is committed; `ACTIVE_PLAN` Stage 4 preview notes the baseline.
+- [x] ADR-0024 records the ablation boundary, fallback semantics, and verdict thresholds.
+- [x] VR-0025 documents byte-identity evidence, light-matrix runtime, and a snapshot of the
       baseline verdict table.
 
 ## Execution Plan
 
-- [ ] **PR 1** — `engine/ablation.py` (config + fallbacks), `optimize(...)` wiring at every
+- [x] **PR 1** — `engine/ablation.py` (config + fallbacks), `optimize(...)` wiring at every
       affected call site (selector override, priors, attempt budget, memory override,
       descriptor_mix filter, hybrid LCB/refinement, bandit selection), unit tests for each
       fallback, byte-identity integration test.
-- [ ] **PR 2** — `engine/ablation_benchmark.py` (`run_ablation_matrix`), the verdict logic,
+- [x] **PR 2** — `engine/ablation_benchmark.py` (`run_ablation_matrix`), the verdict logic,
       `scripts/generate_ablation_report.py`, `make ablation` / `make ablation-full`, light
       integration test (smaller matrix) under `tests/performance/`.
-- [ ] **PR 3** — One-time heavy baseline run, commit the report + a short findings doc, link
+- [x] **PR 3** — One-time heavy baseline run, commit the report + a short findings doc, link
       from `ACTIVE_PLAN`. No production code changes.
 
 ## Risks

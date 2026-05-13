@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 
 REQUIRED_FILES = [
+    Path("CLAUDE.md"),
     Path("docs/architecture/SYSTEM_OVERVIEW.md"),
     Path("docs/process/DEFINITION_OF_DONE.md"),
     Path("docs/process/DEVELOPMENT_WORKFLOW.md"),
@@ -21,6 +23,44 @@ REQUIRED_FILES = [
 ]
 
 KNOWN_SUBSYSTEM_DIRS = {"api", "engine", "learning", "solvers"}
+
+# Substance gate (ADR-0027). Identifiers from the deprecated sematryx-api codebase
+# that the engine must not reproduce without an explicit port/defer/drop decision in
+# `docs/process/ADOPTION_GATE.md`. Maintained per DEVELOPMENT_WORKFLOW.md "Policy
+# constants maintenance" — additions need a CHANGELOG entry; weakenings need an ADR.
+#
+# Each term is a lowercase substring matched against added lines under `src/`. The
+# check only flags ADDITIONS (introductions) so historical occurrences in retained
+# stubs do not trip the gate. When the gate fires, the PR must update
+# `docs/process/ADOPTION_GATE.md` to record the port/defer/drop decision for the term.
+LEGACY_API_VOCABULARY: frozenset[str] = frozenset({
+    "physarum",
+    "tunneling",
+    "tunneling_directive",
+    "contextual_bandit",
+    "autodidactic",
+    "meta_learning",
+    "meta_policy",
+    "transfer_learning",
+    "temporal_intelligence",
+    "knowledge_graph",
+    "causal_discovery",
+    "neural_symbolic",
+    "federated_learning",
+    "self_improving",
+    "adaptive_improvement",
+    "long_term_memory",
+    "vector_memory",
+    "sobol_sensitivity",
+    "sobol_decomposition",
+    "problem_decomposer",
+    "topology_pipeline",
+    "topology_informed",
+    "shgo_subspace_prover",
+    "network_mapper",
+    "exploration_network",
+    "barrier_profile",
+})
 
 
 def _changed_files() -> list[str]:
@@ -101,6 +141,56 @@ def _new_subsystem_dirs(added_files: set[str]) -> set[str]:
             continue
         new_dirs.add(top_dir)
     return new_dirs
+
+
+_WORD_RE = re.compile(r"[a-z_][a-z0-9_]*")
+
+
+def _added_lines_in_src() -> list[str]:
+    """Return all added lines (prefixed with '+' in unified diff) from `src/` files.
+
+    Combines committed branch delta vs origin/main, working-tree diff, and staged
+    diff. Falls back to no output if git commands fail (e.g. shallow CI clone) so the
+    check is best-effort, never a false positive blocker.
+    """
+    diff_commands = [
+        ["git", "diff", "--unified=0", "origin/main...HEAD", "--", "src/"],
+        ["git", "diff", "--unified=0", "HEAD~1...HEAD", "--", "src/"],
+        ["git", "diff", "--unified=0", "--", "src/"],
+        ["git", "diff", "--unified=0", "--cached", "--", "src/"],
+    ]
+    added: list[str] = []
+    for cmd in diff_commands:
+        try:
+            output = subprocess.check_output(
+                cmd, text=True, stderr=subprocess.DEVNULL
+            )
+        except Exception:
+            continue
+        for line in output.splitlines():
+            # Skip diff metadata; collect real added lines only.
+            if not line.startswith("+"):
+                continue
+            if line.startswith("+++"):
+                continue
+            added.append(line[1:])
+    return added
+
+
+def _new_legacy_vocabulary_in_src(added_lines: list[str]) -> set[str]:
+    """Return the subset of LEGACY_API_VOCABULARY that appears in added source lines.
+
+    Word-boundary match against lowercase identifiers so a partial substring inside an
+    unrelated word does not trigger. Comments and docstrings count: legacy vocabulary
+    in any added source line indicates the term is being introduced (or re-introduced)
+    into the engine.
+    """
+    matches: set[str] = set()
+    for line in added_lines:
+        for word in _WORD_RE.findall(line.lower()):
+            if word in LEGACY_API_VOCABULARY:
+                matches.add(word)
+    return matches
 
 
 def main() -> int:
@@ -226,6 +316,21 @@ def main() -> int:
             "was not updated with trial evidence."
         )
 
+    # Substance gate (ADR-0027): if a PR introduces vocabulary from the deprecated
+    # sematryx-api codebase into engine source, the Engine vs Legacy-API Registry in
+    # ADOPTION_GATE.md must be updated with a port/defer/drop decision for each term.
+    # Doc-only changes are not affected — only added source lines under `src/` count.
+    added_lines = _added_lines_in_src()
+    new_vocab = _new_legacy_vocabulary_in_src(added_lines)
+    if new_vocab and not adoption_gate_changed:
+        errors.append(
+            "Substance gate: PR introduces legacy sematryx-api vocabulary into engine "
+            f"source ({', '.join(sorted(new_vocab))}), but docs/process/ADOPTION_GATE.md "
+            "was not updated. Record an explicit port/defer/drop decision in the "
+            "Engine vs Legacy-API Registry section, or rename to avoid the vocabulary. "
+            "See ADR-0027."
+        )
+
     # PRD completion quality gate
     for path in changed:
         if not path.startswith("docs/prd/") or path == "docs/prd/PRD-template.md":
@@ -234,9 +339,15 @@ def main() -> int:
         if "- [ ]" in content:
             errors.append(f"PRD has unchecked checklist items: {path}")
 
-    # Verification report structure gate
+    # Verification report structure gate. The Substance Audit tokens are required so
+    # authors cannot silently elide the substance-vs-name and behavioral-evidence checks
+    # that ADR-0027 added in response to the topology-pipeline drift incident.
     for path in changed:
         if not path.startswith("docs/process/verification/") or path.endswith("IMPLEMENTATION_VERIFICATION_TEMPLATE.md"):
+            continue
+        # Baselines under verification/baselines/ are frozen artefacts (raw ablation
+        # output), not structured VRs. Skip them.
+        if path.startswith("docs/process/verification/baselines/") or path.startswith("docs/process/verification/ablation/"):
             continue
         content = Path(path).read_text(encoding="utf-8")
         required_tokens = [
@@ -244,6 +355,8 @@ def main() -> int:
             "## Planned vs Implemented",
             "## Commands Run",
             "## Shortcut Audit",
+            "Implementation matches what names imply",
+            "Doc claims about behavior have a behavioral test or ablation verdict",
         ]
         for token in required_tokens:
             if token not in content:

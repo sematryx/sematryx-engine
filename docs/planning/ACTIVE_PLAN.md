@@ -202,3 +202,20 @@ mapping, no tunneling solver was implemented. Renamed throughout: `topology_arti
 ADR-0006 marked superseded. The word "topology" is freed for the real pipeline. Stage 4
 Slice 1 reshaped to **port the real topology pipeline from the legacy api reference** —
 the original intent that never landed.
+
+2026-05-13 — **Substance audit + process correction (ADR-0027).** Broader audit comparing
+engine subsystems against the deprecated sematryx-api revealed the topology drift was a
+representative sample, not an outlier. Engine subsystems consistently inherited api
+vocabulary (`contextual bandit`, `meta_learning`, `autodidactic`, `temporal_intelligence`,
+`knowledge_graph`, etc.) without porting substance: bandit 67 LOC vs api 2,460; memory
+166 vs ~8,394; AI module 0 vs ~31,251; explainability 71 vs ~1,151. Guardrails installed:
+(1) Engine vs Legacy-API Registry in `ADOPTION_GATE.md` enumerates every audited
+subsystem with port/defer/drop decision, (2) substance gate in `scripts/check_policy.py`
+fails CI when api vocabulary is introduced into engine source without a registry decision,
+(3) VR template Substance Audit section made mandatory via `required_tokens`,
+(4) PRD template Acceptance Shape section forces structural-vs-behavioural declaration,
+(5) `CLAUDE.md` at repo root replaces the README as AI top-of-context document,
+(6) `INCIDENT_RESPONSE.md` adds doc-drift trigger and procedure, (7) policy constants
+maintenance documented in `DEVELOPMENT_WORKFLOW.md`. README and SYSTEM_OVERVIEW rewritten
+honestly with Current Substance State table. The next AI session that introduces inherited
+api vocabulary into engine source will be blocked at CI.
