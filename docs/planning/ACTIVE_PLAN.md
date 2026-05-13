@@ -49,9 +49,23 @@ Candidate slices (status):
 
 ## Next 3 Slices
 
-1. Stage 4 topology–solver integration: deepen Physarum tunneling + routing evidence beyond scaffolding.
+1. **Stage 4 topology–solver integration — heuristic fix first, deepening after** (reshaped per
+   pre-Stage-4 ablation baseline, see
+   `docs/process/verification/baselines/FINDINGS-pre-stage-4-ablation.md`). The current
+   `topology_routing` override never fires on any tested scenario because the firing gate
+   (`score >= 0.75` or `directive == "aggressive"`) is never crossed — and the firing condition
+   itself appears to have its budget term inverted (`tight=1.0` routes `scipy_dual_annealing` at
+   tight budgets, but dual_annealing needs budget to be effective). Slice 1 ordered tasks:
+   (a) add a scenario that triggers the override under the current heuristic + a scenario that
+   would trigger under the inverted heuristic; (b) measure both with `make ablation`;
+   (c) flip the `budget_factor` mapping in `topology.py` if the prediction holds (recorded as
+   ADR-0006 successor); (d) re-run baseline and confirm `topology_routing` produces a "feature
+   helps" verdict on at least one scenario; (e) only then deepen topology integration. `make
+   ablation` is the regression gate for each step.
 2. Stage 4 legacy continuous roster: close parity gaps called out in subsystem docs / debt register.
-3. Stage 4 autodidactic loop: measurable improvements on expanded benchmark classes (ties Stage 4 acceptance criterion 5).
+3. Stage 4 autodidactic loop: measurable improvements on expanded benchmark classes (ties Stage 4
+   acceptance criterion 5). Baseline confirms `autodidactic_loop` already helps on rugged
+   multimodal (Δ=+100% when off, p<0.001); expansion targets are new problem classes.
 
 ## Deferred optional engine work
 
@@ -146,3 +160,16 @@ adaptive solving loops, richer learning, and complete explainability in the loca
 2026-05-11 — Stage 3 optional closure (ADR-0023): hybrid LCB acquisition outer loop + descriptor_mix SQLite memory filter + hybrid inner wiring; ACTIVE_PLAN Stage 4 primary; stale gate paragraph corrected. Prior: acceptance closure + hybrid refinement + validation + bandit guard.
 
 2026-05-12 — Full Bayesian / GP / Thompson hybrid **outer** loop explicitly listed under Deferred optional engine work and expanded in `INTEGRATION_DEBT.md`.
+
+2026-05-12 — Pre-Stage-4 ablation baseline (PRD-0025 / ADR-0024) committed under
+`docs/process/verification/baselines/`. Findings: `autodidactic_loop` and `tuning_priors` are
+statistically significant helpers; `topology_routing` shows zero measurable effect on every
+scenario. Slice 1 scope reshaped — scenario design before deepening.
+
+2026-05-13 — Follow-up analysis of the topology_routing "no effect" verdict: the override's
+firing gate never opens under any tested scenario (`physarum_tunneling_score` tops out at 0.693,
+threshold is 0.75), and the underlying `budget_factor` mapping in `topology.py` appears to
+have its sign inverted (currently routes aggressive global search at *tight* budgets, where
+`scipy_dual_annealing` cannot converge). Slice 1 reshape now records the heuristic fix as an
+ordered prerequisite to any deepening work. See findings doc for hypothesis tests and
+predictions.
