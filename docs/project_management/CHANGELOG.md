@@ -1,6 +1,43 @@
 # Changelog
 
-## 2026-05-13
+## 2026-05-13 (PR 6 — substance audit + process guardrails)
+
+- **ADR-0027: substance audit + process correction.** Broader audit found the engine
+  inherited api vocabulary across many subsystems (bandit, learning, memory, AI,
+  explainability) without porting substance. LOC ratios: bandit 37×, memory 50×,
+  AI module ∞ (engine has none), explainability 16×. The topology drift caught by
+  ADR-0026 was a representative sample, not an outlier.
+- **Engine vs Legacy-API Registry** populated in `docs/process/ADOPTION_GATE.md`.
+  Every audited subsystem gets a row with current status (stub / partial /
+  fully-ported / deferred / dropped / renamed), api reference, engine reference,
+  and decision rationale.
+- **Substance gate in `scripts/check_policy.py`:** new `LEGACY_API_VOCABULARY`
+  constant + check that scans added lines under `src/` for inherited identifiers.
+  When found, requires `docs/process/ADOPTION_GATE.md` to be in the PR's changed
+  files. Source-only scanning so docs can describe these terms freely.
+- **VR template Substance Audit section** (`docs/process/verification/IMPLEMENTATION_VERIFICATION_TEMPLATE.md`)
+  with mandatory checkboxes for substance-matches-names and doc-claims-have-backing.
+  Two load-bearing phrases added to `required_tokens` in the policy script so CI
+  fails if a VR omits them.
+- **PRD template Acceptance Shape section** forces authors to declare each
+  acceptance criterion as structural or behavioural, with at least one behavioural
+  criterion required for any feature claiming user-facing value.
+- **`CLAUDE.md` at repo root** as the AI top-of-context document. Short pointer doc
+  stating product purpose, relationship to deprecated api, hard rules. Added to
+  `REQUIRED_FILES` in the policy script.
+- **`INCIDENT_RESPONSE.md`** adds documentation-drift trigger and procedure.
+- **`DEVELOPMENT_WORKFLOW.md`** documents the policy-constants maintenance process
+  (`REQUIRED_FILES`, `KNOWN_SUBSYSTEM_DIRS`, `LEGACY_API_VOCABULARY`) — including the
+  rule that a new subsystem directory name cannot enter `KNOWN_SUBSYSTEM_DIRS` in
+  the same PR that introduces the subsystem code.
+- **README.md rewritten** — removed feature-accretion wall; added Current Substance
+  State table referencing the registry; explicit relationship to deprecated api.
+- **SYSTEM_OVERVIEW.md rewritten** — Mermaid diagram cleaned (Multi-Armed Bandit,
+  not Contextual); Current Substance State table added; audit history footer added.
+- **VR-0025** written documenting the ablation harness verification with the new
+  Substance Audit section format.
+
+## 2026-05-13 (PR 5)
 
 - **ADR-0026 / PR 5 — rename topology stub to problem-shape classifier; record drift; reshape Slice 1.**
   Audit found that PRD-0006 / ADR-0005 (topology pipeline scaffold) shipped a problem-shape

@@ -25,6 +25,22 @@
   finding under realistic warmup, not a measurement gap). A future refinement could
   decouple warmup writes — memory-only warmup, bandit-only warmup — to isolate each
   knob's unique contribution. Deferred until the question matters.
+- **Subsystem port decisions surfaced by ADR-0027 substance audit.** The Engine vs
+  Legacy-API Registry in `docs/process/ADOPTION_GATE.md` lists multiple subsystems
+  in `decision needed` status (meta-learning, transfer learning, vector memory,
+  knowledge graph, temporal intelligence, AI module). Each needs an explicit
+  port/defer/drop decision before the next audit cycle. Likely outcomes for v1
+  local-first scope: most → drop or defer; a few (bandit, explainability) may
+  warrant partial port.
+- **Stubs flagged for rename or implementation by ADR-0027 audit.** Bandit ("contextual"
+  claim withdrawn — flat Thompson sampling), multi-attempt loop ("autodidactic" name
+  overstated), decision metadata ("explanation" suggests reasoning, code is trace
+  metadata), adaptation overlay ("tying" implies causality, code is static dict).
+  Each needs a rename per ADR-0026 pattern or an actual implementation.
+- **Periodic substance audit cadence.** ADR-0027 installed machine-checkable guards
+  against new drift, but doesn't schedule re-audits to catch drift in subsystems
+  not yet vocabulary-listed. Suggested cadence: every 10 PRs or quarterly.
+  Currently informal — formalise after the post-ADR-0027 system runs for a quarter.
 
 ## Policy
 

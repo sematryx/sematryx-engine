@@ -69,6 +69,41 @@ align the protected branch’s required check name in GitHub settings.
 .venv311/bin/python scripts/check_policy.py
 ```
 
+## Policy constants maintenance (ADR-0027)
+
+`scripts/check_policy.py` defines three constants that drive CI enforcement. Each
+has a specific maintenance rule:
+
+### `REQUIRED_FILES`
+
+Governance files that must exist at the repository root. Adding a row is appropriate
+when a new mandatory governance doc is introduced (e.g., `CLAUDE.md` was added by
+ADR-0027). Removing a row requires an ADR that justifies retiring the doc.
+
+### `KNOWN_SUBSYSTEM_DIRS`
+
+Top-level directories under `src/sematryx_engine/` that are considered established.
+The policy script's adoption-gate trigger fires when a new directory appears that is
+**not** in this set — this is the guard against silently adding a new subsystem
+without running it through the Adoption Gate.
+
+**Important:** do not add a directory name to `KNOWN_SUBSYSTEM_DIRS` in the same PR
+that introduces the subsystem code. The adoption-gate trigger must fire on the
+introduction PR. The whitelist update happens in a follow-up PR after the gate is
+satisfied (PRD + VR + benchmark evidence + ADR if applicable). Updating in the same
+PR weakens enforcement; reviewers should reject this combination.
+
+### `LEGACY_API_VOCABULARY`
+
+Identifiers from the deprecated sematryx-api codebase
+(`/home/workspace/sematryx-api/`) that the engine must not adopt without an
+explicit decision in the Engine vs Legacy-API Registry in `ADOPTION_GATE.md`. The
+policy script's substance gate scans added lines under `src/` against this set.
+
+Routine updates (audits surface new terms) require a CHANGELOG entry and a
+corresponding registry row. Weakening updates (removing terms, narrowing the scan)
+require an ADR justifying the change in enforcement scope.
+
 ## Ablation Harness
 
 The ablation harness (PRD-0025 / ADR-0024) toggles each integrated optimizer feature to a
