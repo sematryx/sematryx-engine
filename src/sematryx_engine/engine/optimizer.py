@@ -11,7 +11,7 @@ from sematryx_engine.api.variable_descriptors import (
 from sematryx_engine.engine.ablation import AblationConfig, coerce
 from sematryx_engine.engine.problem_features import ProblemFeatures, extract_problem_features
 from sematryx_engine.engine.strategy_selector import StrategySelector
-from sematryx_engine.engine.topology import build_topology_artifact
+from sematryx_engine.engine.problem_shape_classifier import build_problem_shape
 from sematryx_engine.engine.tuning_priors import compute_solver_tuning_priors, neutral_tuning_priors
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
 from sematryx_engine.solvers.discrete_solvers import solve_discrete_baseline
@@ -31,11 +31,11 @@ _SELECTOR = StrategySelector(
 def _attempt_budget(
     *,
     max_evaluations: int,
-    topology_budget_regime: str,
+    budget_regime: str,
 ) -> int:
-    if topology_budget_regime == "generous":
+    if budget_regime == "generous":
         return 3
-    if topology_budget_regime == "moderate":
+    if budget_regime == "moderate":
         return 2
     return 1
 
@@ -95,7 +95,7 @@ def run_optimization(
 
     if hybrid_descriptors is not None:
         features = extract_problem_features(bounds=bounds, max_evaluations=max_evaluations)
-        topology_artifact = build_topology_artifact(
+        problem_shape = build_problem_shape(
             bounds=bounds,
             max_evaluations=max_evaluations,
         )
@@ -107,7 +107,7 @@ def run_optimization(
         inner_strategy, inner_confidence, inner_basis = _SELECTOR.select_with_basis(
             features=sub_features,
             domain=domain,
-            topology_artifact=topology_artifact.as_dict(),
+            problem_shape=problem_shape.as_dict(),
             exclude_strategies=frozenset(
                 {"discrete_random_neighborhood", "hybrid_outer_random_inner_scipy"}
             ),
@@ -120,8 +120,8 @@ def run_optimization(
         tuning_priors = (
             compute_solver_tuning_priors(
                 features=features,
-                topology_budget_regime=topology_artifact.budget_regime,
-                tunneling_directive=topology_artifact.tunneling_directive,
+                budget_regime=problem_shape.budget_regime,
+                shape_routing_directive=problem_shape.shape_routing_directive,
                 domain=domain,
             )
             if ab.tuning_priors
@@ -174,20 +174,20 @@ def run_optimization(
             evaluations=int(getattr(scipy_result, "nfev", 0)),
             strategy_used=strategy_name,
             success=practical_success,
-            topology_artifact=topology_artifact.as_dict(),
+            problem_shape=problem_shape.as_dict(),
             explanation={
                 "selection_basis": selection_basis,
                 "selection_confidence": selection_confidence,
                 "domain": domain,
                 "strategy_used": strategy_name,
-                "topology_tunneling_directive": topology_artifact.tunneling_directive,
-                "topology_physarum_tunneling_score": topology_artifact.physarum_tunneling_score,
+                "shape_routing_directive": problem_shape.shape_routing_directive,
+                "shape_routing_score": problem_shape.shape_routing_score,
                 "attempt_limit": 1,
                 "attempts": hybrid_attempt_records,
                 "tuning_priors": tuning_priors,
                 "adaptation": {
-                    "topology_budget_regime": topology_artifact.budget_regime,
-                    "topology_complexity_hint": topology_artifact.complexity_hint,
+                    "budget_regime": problem_shape.budget_regime,
+                    "complexity_hint": problem_shape.complexity_hint,
                     "problem_complexity": features.complexity,
                     "problem_dimensions": features.dimensions,
                     "problem_budget_per_dimension": features.budget_per_dimension,
@@ -204,7 +204,7 @@ def run_optimization(
 
     if discrete_descriptors is not None:
         features = extract_problem_features(bounds=bounds, max_evaluations=max_evaluations)
-        topology_artifact = build_topology_artifact(
+        problem_shape = build_problem_shape(
             bounds=bounds,
             max_evaluations=max_evaluations,
         )
@@ -214,8 +214,8 @@ def run_optimization(
         tuning_priors = (
             compute_solver_tuning_priors(
                 features=features,
-                topology_budget_regime=topology_artifact.budget_regime,
-                tunneling_directive=topology_artifact.tunneling_directive,
+                budget_regime=problem_shape.budget_regime,
+                shape_routing_directive=problem_shape.shape_routing_directive,
                 domain=domain,
             )
             if ab.tuning_priors
@@ -264,20 +264,20 @@ def run_optimization(
             evaluations=int(getattr(scipy_result, "nfev", 0)),
             strategy_used=strategy_name,
             success=practical_success,
-            topology_artifact=topology_artifact.as_dict(),
+            problem_shape=problem_shape.as_dict(),
             explanation={
                 "selection_basis": selection_basis,
                 "selection_confidence": selection_confidence,
                 "domain": domain,
                 "strategy_used": strategy_name,
-                "topology_tunneling_directive": topology_artifact.tunneling_directive,
-                "topology_physarum_tunneling_score": topology_artifact.physarum_tunneling_score,
+                "shape_routing_directive": problem_shape.shape_routing_directive,
+                "shape_routing_score": problem_shape.shape_routing_score,
                 "attempt_limit": 1,
                 "attempts": discrete_attempt_records,
                 "tuning_priors": tuning_priors,
                 "adaptation": {
-                    "topology_budget_regime": topology_artifact.budget_regime,
-                    "topology_complexity_hint": topology_artifact.complexity_hint,
+                    "budget_regime": problem_shape.budget_regime,
+                    "complexity_hint": problem_shape.complexity_hint,
                     "problem_complexity": features.complexity,
                     "problem_dimensions": features.dimensions,
                     "problem_budget_per_dimension": features.budget_per_dimension,
@@ -290,14 +290,14 @@ def run_optimization(
         )
 
     features = extract_problem_features(bounds=bounds, max_evaluations=max_evaluations)
-    topology_artifact = build_topology_artifact(
+    problem_shape = build_problem_shape(
         bounds=bounds,
         max_evaluations=max_evaluations,
     )
     strategy_name, selection_confidence, selection_basis = _SELECTOR.select_with_basis(
         features=features,
         domain=domain,
-        topology_artifact=topology_artifact.as_dict(),
+        problem_shape=problem_shape.as_dict(),
         exclude_strategies=frozenset(
             {"discrete_random_neighborhood", "hybrid_outer_random_inner_scipy"}
         ),
@@ -306,8 +306,8 @@ def run_optimization(
     tuning_priors = (
         compute_solver_tuning_priors(
             features=features,
-            topology_budget_regime=topology_artifact.budget_regime,
-            tunneling_directive=topology_artifact.tunneling_directive,
+            budget_regime=problem_shape.budget_regime,
+            shape_routing_directive=problem_shape.shape_routing_directive,
             domain=domain,
         )
         if ab.tuning_priors
@@ -316,7 +316,7 @@ def run_optimization(
     attempt_limit = (
         _attempt_budget(
             max_evaluations=max_evaluations,
-            topology_budget_regime=topology_artifact.budget_regime,
+            budget_regime=problem_shape.budget_regime,
         )
         if ab.autodidactic_loop
         else 1
@@ -398,20 +398,20 @@ def run_optimization(
         evaluations=int(getattr(scipy_result, "nfev", 0)),
         strategy_used=best_strategy,
         success=practical_success,
-        topology_artifact=topology_artifact.as_dict(),
+        problem_shape=problem_shape.as_dict(),
         explanation={
             "selection_basis": selection_basis,
             "selection_confidence": selection_confidence,
             "domain": domain,
             "strategy_used": best_strategy,
-            "topology_tunneling_directive": topology_artifact.tunneling_directive,
-            "topology_physarum_tunneling_score": topology_artifact.physarum_tunneling_score,
+            "shape_routing_directive": problem_shape.shape_routing_directive,
+            "shape_routing_score": problem_shape.shape_routing_score,
             "attempt_limit": attempt_limit,
             "attempts": attempt_records,
             "tuning_priors": tuning_priors,
             "adaptation": {
-                "topology_budget_regime": topology_artifact.budget_regime,
-                "topology_complexity_hint": topology_artifact.complexity_hint,
+                "budget_regime": problem_shape.budget_regime,
+                "complexity_hint": problem_shape.complexity_hint,
                 "problem_complexity": features.complexity,
                 "problem_dimensions": features.dimensions,
                 "problem_budget_per_dimension": features.budget_per_dimension,

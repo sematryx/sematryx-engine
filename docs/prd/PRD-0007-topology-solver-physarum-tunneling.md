@@ -1,5 +1,13 @@
 # PRD-0007: Topology-Solver Integration with Physarum Tunneling
 
+> **Status: Superseded by ADR-0026** (2026-05-13). The "Physarum tunneling" integration
+> this PRD scoped was never implemented — no landscape mapping, no tunneling solver,
+> no Physarum machinery. What shipped is a hardcoded "force `scipy_dual_annealing` when
+> the shape-routing score crosses 0.75" override, now correctly named
+> `_shape_routing_override`. The real integration (port the legacy api's `PhysarumNetworkMapper`
+> and `TopologyInformedTunneling` into the engine, wire mapper → solver) is Stage 4
+> Slice 1. See ADR-0026 and the reshaped ACTIVE_PLAN entry.
+
 ## Problem Statement
 
 Topology artifacts were generated but not used for routing. A required enhancement is to integrate

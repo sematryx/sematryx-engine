@@ -49,16 +49,21 @@ Candidate slices (status):
 
 ## Next 3 Slices
 
-1. **Stage 4 topology–solver integration — expand firing-scenario coverage, then deepen.**
-   v2 baseline (`docs/process/verification/baselines/FINDINGS-pre-stage-4-ablation.md`) shows
-   `topology_routing` *helps* (Δ=+71%, p<0.001) on the single firing scenario we built
-   (`topology_firing_current`: 13D rugged, tight budget). The inverted-heuristic hypothesis from
-   the v1 reshape is **withdrawn**. Slice 1 ordered tasks:
-   (a) build additional firing scenarios at other (complexity, budget_regime, landscape)
-   combinations — e.g. 13D smooth, 8D tight rugged, 20D generous; measure each with
-   `make ablation`; (b) if the override helps on most, deepen Physarum signal extraction
-   (richer score components, more directives) — otherwise re-evaluate the heuristic with the
-   broader data; (c) `make ablation` regression gate at each step.
+1. **Stage 4 Slice 1 — port the real topology pipeline (closes original-intent drift).**
+   The engine's current `problem_shape_classifier` is a problem-space-shape classifier with
+   topology-themed naming that ADR-0026 has corrected. The original intent of PRD-0007 /
+   ADR-0006 — "integrate Physarum mapping output into the tunneling solver path so the
+   mapper's landscape characterisation actually informs solver decisions" — was never
+   implemented in the engine. The legacy api codebase has a real ~2,278-line topology
+   pipeline (Sobol decomposition + `PhysarumNetworkMapper` + `TopologyInformedTunneling`
+   + `SHGOSubspaceProver`) at
+   `/home/workspace/sematryx-api/sematryx/core/optimizers/topology_pipeline.py`. Slice 1
+   ports this into the engine under ablation gating, each piece independently measured.
+   Ordered sub-slices: (1a) port Sobol decomposition + ablation evidence; (1b) port
+   Physarum network mapping + ablation evidence; (1c) port topology-informed tunneling +
+   wire mapper→solver + ablation evidence; (1d) port SHGO subspace prover (optional);
+   (1e) orchestrator + integration tests. Decide post-port whether the shape-routing
+   override stays or is retired.
 2. Stage 4 legacy continuous roster: close parity gaps called out in subsystem docs / debt register.
    Note: `hybrid_outer_refinement` is *load-bearing* on `hybrid_separating` (without it the hybrid
    solver misses the optimum by ~4). Roster changes that touch the hybrid path must preserve this.
@@ -184,3 +189,16 @@ first." Confirmed helpers: `topology_routing`, `autodidactic_loop`, `tuning_prio
 `hybrid_outer_refinement`. Still "no effect" under tested scenarios: `continuous_bandit`,
 `descriptor_mix_memory`, `hybrid_outer_acquisition`. `memory_override` shifts the rank
 distribution without moving the median.
+
+2026-05-13 — **Audit + rename (ADR-0026).** Investigation revealed the engine's "topology
+pipeline" was a 89-line problem-shape classifier wearing topology vocabulary inherited from
+the legacy api codebase, *not* a real topology pipeline. PRD-0007 / ADR-0006's "Physarum
+tunneling integration" was a hardcoded `scipy_dual_annealing` override gated by problem-shape
+signals (dimensions + budget + bound variability); no Physarum machinery, no landscape
+mapping, no tunneling solver was implemented. Renamed throughout: `topology_artifact` →
+`problem_shape`, `physarum_tunneling_score` → `shape_routing_score`, `tunneling_directive` →
+`shape_routing_directive`, `topology_routing` ablation knob → `shape_routing`,
+`_topology_tunneling_override` → `_shape_routing_override`. PRD-0006, PRD-0007, ADR-0005,
+ADR-0006 marked superseded. The word "topology" is freed for the real pipeline. Stage 4
+Slice 1 reshaped to **port the real topology pipeline from the legacy api reference** —
+the original intent that never landed.

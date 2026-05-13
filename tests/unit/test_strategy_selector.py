@@ -59,7 +59,7 @@ def test_selector_deterministic_bandit_mode(tmp_path: Path) -> None:
     assert strategy == "scipy_de"
 
 
-def test_selector_prefers_tunneling_when_physarum_signal_is_aggressive(tmp_path: Path) -> None:
+def test_selector_routes_to_dual_annealing_when_shape_score_is_aggressive(tmp_path: Path) -> None:
     memory = LocalStrategyMemory(tmp_path / "strategy_memory.db")
     selector = StrategySelector(memory=memory)
     features = extract_problem_features(bounds=[(-8.0, 8.0)] * 6, max_evaluations=120)
@@ -67,12 +67,12 @@ def test_selector_prefers_tunneling_when_physarum_signal_is_aggressive(tmp_path:
     strategy, confidence, basis = selector.select_with_basis(
         features=features,
         domain="general",
-        topology_artifact={
-            "physarum_tunneling_score": 0.91,
-            "tunneling_directive": "aggressive",
+        problem_shape={
+            "shape_routing_score": 0.91,
+            "shape_routing_directive": "aggressive",
         },
     )
 
     assert strategy == "scipy_dual_annealing"
     assert confidence == 0.86
-    assert basis == "physarum_tunneling_override"
+    assert basis == "shape_routing_override"

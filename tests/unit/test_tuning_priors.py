@@ -19,8 +19,8 @@ def test_compute_solver_tuning_priors_schema() -> None:
     )
     priors = compute_solver_tuning_priors(
         features=features,
-        topology_budget_regime="moderate",
-        tunneling_directive="balanced",
+        budget_regime="moderate",
+        shape_routing_directive="balanced",
         domain="unit_test_domain",
     )
     assert priors["version"] == 1

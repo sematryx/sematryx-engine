@@ -1,5 +1,12 @@
 # PRD-0006: Stage 4 Topology Pipeline Kickoff
 
+> **Status: Superseded by ADR-0026** (2026-05-13). The artifact this PRD scoped as a
+> "topology pipeline scaffold" is now correctly named `problem_shape_classifier` — it
+> classifies problems by problem-space shape (dimensions, bounds, budget), not by
+> landscape topology. The acceptance criteria below are still met at the classifier
+> level; the framing of "scaffold for a real topology pipeline" is replaced by Stage 4
+> Slice 1, which ports the real pipeline from the legacy api reference.
+
 ## Problem Statement
 
 Stage 4 depends on topology-driven routing and adaptation, but runtime outputs currently expose no

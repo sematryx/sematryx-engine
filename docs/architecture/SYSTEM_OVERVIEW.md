@@ -6,7 +6,7 @@ flowchart LR
     API --> VD[Variable Descriptor Validation]
     VD --> OPT[Engine Optimizer]
     OPT --> FEAT[Problem Features]
-    OPT --> TOPO[Topology Artifact + Physarum Signal]
+    OPT --> SHAPE[Problem-Shape Classifier]
     OPT --> SEL[Strategy Selector]
     SEL --> MEM[(Local Strategy Memory SQLite)]
     SEL --> BANDIT[Contextual Bandit]
@@ -35,12 +35,16 @@ flowchart LR
 - Stage 3 discrete validation adds knapsack- and assignment-shaped scenarios (`discrete_benchmark_scenarios`)
   exercised in integration tests and `make benchmark`.
 - Snapshot version 2 adds reproducible objective-quality rows (isolated memory/bandit paths + scipy solve).
-- Stage 4 topology integration consumes Physarum signal to inform tunneling-oriented strategy routing.
-- Result payload includes structured explanation schema (basis/confidence + topology evidence).
+- Problem-shape classifier (`build_problem_shape`) emits a deterministic shape-routing
+  score + directive from bounds and budget. When the score crosses 0.75 or the directive
+  is `aggressive`, the selector's shape-routing override forces `scipy_dual_annealing`.
+  This is **not** a topology pipeline — see ADR-0026. The real topology pipeline is
+  Stage 4 Slice 1.
+- Result payload includes structured explanation schema (basis/confidence + shape-routing evidence).
 - Continuous roster now includes multiple SciPy local/global methods to improve Stage 4 routing surface.
-- Optimizer can execute bounded topology-budgeted retries and return per-attempt rationale in explanations.
+- Optimizer can execute bounded shape-budgeted retries (attempt count derived from `budget_regime`) and return per-attempt rationale in explanations.
 - Deterministic tuning priors scale SciPy budgets/settings before each attempt and are echoed in explanations.
-- Explanations include adaptation overlays referencing topology/problem summaries plus retry winners.
+- Explanations include adaptation overlays referencing problem-shape summaries plus retry winners.
 - Core-depth validation tests gate benchmark thresholds and runtime contract parity fields.
 - Optional non-SciPy backends are included only when corresponding packages are installed.
 - Concise/verbose formatter helpers summarize explanation payloads for CLI/notebook workflows.

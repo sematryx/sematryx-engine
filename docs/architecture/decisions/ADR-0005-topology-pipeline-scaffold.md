@@ -2,7 +2,13 @@
 
 ## Status
 
-Accepted
+**Superseded by ADR-0026** (2026-05-13). The artifact this ADR named "topology" is renamed
+to `ProblemShape` / `problem_shape_classifier`; the "scaffold for a real topology pipeline"
+framing is replaced by an honest problem-shape-classifier scope. The real topology
+pipeline (Sobol decomposition + Physarum network mapping + topology-informed tunneling)
+is now scoped as Stage 4 Slice 1.
+
+Originally: Accepted
 
 ## Context
 

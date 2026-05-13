@@ -19,7 +19,7 @@ from sematryx_engine.engine.ablation_benchmark import (
     default_scenarios,
     run_ablation_matrix,
 )
-from sematryx_engine.engine.topology import build_topology_artifact
+from sematryx_engine.engine.problem_shape_classifier import build_problem_shape
 from sematryx_engine.learning.strategy_memory import LocalStrategyMemory
 
 
@@ -126,23 +126,23 @@ def test_warmup_populates_memory_for_override_firing(tmp_path: Path) -> None:
     )
 
 
-def test_topology_firing_scenario_actually_fires() -> None:
-    """`topology_firing_current` must cross the override gate
-    (`score >= 0.75` or `directive == 'aggressive'`). Otherwise topology_routing remains
+def test_shape_routing_firing_scenario_actually_fires() -> None:
+    """`shape_routing_firing_current` must cross the override gate
+    (`score >= 0.75` or `directive == 'aggressive'`). Otherwise shape_routing remains
     unmeasured and the scenario is dead weight."""
-    firing = next(s for s in default_scenarios() if s.name == "topology_firing_current")
+    firing = next(s for s in default_scenarios() if s.name == "shape_routing_firing_current")
     kwargs = firing.build_kwargs(101)
-    artifact = build_topology_artifact(
+    shape = build_problem_shape(
         bounds=kwargs["bounds"],
         max_evaluations=kwargs["max_evaluations"],
     )
     fires = (
-        artifact.tunneling_directive == "aggressive"
-        or artifact.physarum_tunneling_score >= 0.75
+        shape.shape_routing_directive == "aggressive"
+        or shape.shape_routing_score >= 0.75
     )
     assert fires, (
-        f"topology_firing_current does not trigger the override gate: "
-        f"score={artifact.physarum_tunneling_score}, directive={artifact.tunneling_directive}"
+        f"shape_routing_firing_current does not trigger the override gate: "
+        f"score={shape.shape_routing_score}, directive={shape.shape_routing_directive}"
     )
 
 

@@ -24,12 +24,14 @@ selection quality can improve across process restarts.
 
 Bandit rewards from each run use `min(1, 1/(1+sqrt(best_value)))` for smoother updates across objective scales.
 
-Each optimization result now includes a deterministic `topology_artifact` scaffold
-(dimensions, span profile, budget regime, complexity hint) for Stage 4 topology integration.
-The topology artifact now includes Physarum tunneling guidance and can directly influence
-strategy selection for aggressive tunneling cases.
-Optimization results also include a structured `explanation` payload describing selection basis,
-confidence, and topology-tunneling evidence.
+Each optimization result includes a deterministic `problem_shape` classification
+(dimensions, span profile, budget regime, complexity hint, shape-routing score and
+directive). This classifier routes problems by **problem-space shape** — bounds, dims,
+budget — *not* by any objective-landscape topology. A high score routes the selector
+to `scipy_dual_annealing` via the shape-routing override. The real topology pipeline
+(Physarum mapping → topology-informed tunneling) is a separate slice; see ADR-0026.
+Optimization results also include a structured `explanation` payload describing selection
+basis, confidence, and shape-routing evidence.
 The continuous strategy roster now includes additional SciPy methods (`shgo`, `powell`, `tnc`,
 `slsqp`, `cobyla`, `nelder-mead`, `cg`) beyond DE/dual-annealing/L-BFGS-B.
 Runtime now supports a bounded autodidactic retry loop (1-3 attempts based on topology budget regime),

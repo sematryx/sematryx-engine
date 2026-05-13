@@ -29,8 +29,8 @@ def format_explanation_verbose(result: OptimizationResult) -> str:
         f"- Strategy used: {result.explanation.get('strategy_used', result.strategy_used)}",
         f"- Selection basis: {result.explanation.get('selection_basis', 'unknown')}",
         f"- Selection confidence: {result.explanation.get('selection_confidence', 'n/a')}",
-        f"- Topology tunneling directive: {result.explanation.get('topology_tunneling_directive', 'n/a')}",
-        f"- Topology Physarum score: {result.explanation.get('topology_physarum_tunneling_score', 'n/a')}",
+        f"- Shape routing directive: {result.explanation.get('shape_routing_directive', 'n/a')}",
+        f"- Shape routing score: {result.explanation.get('shape_routing_score', 'n/a')}",
     ]
 
     tuning = result.explanation.get("tuning_priors")
@@ -41,7 +41,7 @@ def format_explanation_verbose(result: OptimizationResult) -> str:
     if isinstance(adaptation, dict):
         lines.append("- Adaptation:")
         for key in [
-            "topology_budget_regime",
+            "budget_regime",
             "problem_complexity",
             "global_evaluation_budget",
             "winning_attempt",

@@ -8,5 +8,5 @@ class OptimizationResult:
     evaluations: int
     strategy_used: str
     success: bool
-    topology_artifact: dict[str, object] | None = None
+    problem_shape: dict[str, object] | None = None
     explanation: dict[str, object] | None = None
