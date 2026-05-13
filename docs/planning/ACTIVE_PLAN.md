@@ -49,23 +49,23 @@ Candidate slices (status):
 
 ## Next 3 Slices
 
-1. **Stage 4 topology–solver integration — heuristic fix first, deepening after** (reshaped per
-   pre-Stage-4 ablation baseline, see
-   `docs/process/verification/baselines/FINDINGS-pre-stage-4-ablation.md`). The current
-   `topology_routing` override never fires on any tested scenario because the firing gate
-   (`score >= 0.75` or `directive == "aggressive"`) is never crossed — and the firing condition
-   itself appears to have its budget term inverted (`tight=1.0` routes `scipy_dual_annealing` at
-   tight budgets, but dual_annealing needs budget to be effective). Slice 1 ordered tasks:
-   (a) add a scenario that triggers the override under the current heuristic + a scenario that
-   would trigger under the inverted heuristic; (b) measure both with `make ablation`;
-   (c) flip the `budget_factor` mapping in `topology.py` if the prediction holds (recorded as
-   ADR-0006 successor); (d) re-run baseline and confirm `topology_routing` produces a "feature
-   helps" verdict on at least one scenario; (e) only then deepen topology integration. `make
-   ablation` is the regression gate for each step.
+1. **Stage 4 topology–solver integration — expand firing-scenario coverage, then deepen.**
+   v2 baseline (`docs/process/verification/baselines/FINDINGS-pre-stage-4-ablation.md`) shows
+   `topology_routing` *helps* (Δ=+71%, p<0.001) on the single firing scenario we built
+   (`topology_firing_current`: 13D rugged, tight budget). The inverted-heuristic hypothesis from
+   the v1 reshape is **withdrawn**. Slice 1 ordered tasks:
+   (a) build additional firing scenarios at other (complexity, budget_regime, landscape)
+   combinations — e.g. 13D smooth, 8D tight rugged, 20D generous; measure each with
+   `make ablation`; (b) if the override helps on most, deepen Physarum signal extraction
+   (richer score components, more directives) — otherwise re-evaluate the heuristic with the
+   broader data; (c) `make ablation` regression gate at each step.
 2. Stage 4 legacy continuous roster: close parity gaps called out in subsystem docs / debt register.
+   Note: `hybrid_outer_refinement` is *load-bearing* on `hybrid_separating` (without it the hybrid
+   solver misses the optimum by ~4). Roster changes that touch the hybrid path must preserve this.
 3. Stage 4 autodidactic loop: measurable improvements on expanded benchmark classes (ties Stage 4
-   acceptance criterion 5). Baseline confirms `autodidactic_loop` already helps on rugged
-   multimodal (Δ=+100% when off, p<0.001); expansion targets are new problem classes.
+   acceptance criterion 5). v2 baseline confirms `autodidactic_loop` helps on rugged multimodal
+   (Δ=+48% when off under warmup; was +100% cold in v1). Expansion targets are new problem classes
+   where the multi-attempt loop should compound (deceptive landscapes, multi-basin objectives).
 
 ## Deferred optional engine work
 
@@ -173,3 +173,14 @@ have its sign inverted (currently routes aggressive global search at *tight* bud
 `scipy_dual_annealing` cannot converge). Slice 1 reshape now records the heuristic fix as an
 ordered prerequisite to any deepening work. See findings doc for hypothesis tests and
 predictions.
+
+2026-05-13 — Ablation harness v2 ships with warmup phase (ADR-0025), firing scenario
+(`topology_firing_current`), and separating hybrid scenario (`hybrid_separating`). New heavy
+baseline (`ablation_pre-stage-4-v2`) gives every knob a verdict. **Inverted-heuristic hypothesis
+is withdrawn:** `topology_routing` measurably *helps* (Δ=+71%, p<0.001) on the firing scenario —
+forced `scipy_dual_annealing` beats the bandit's natural mix on 13D tight-budget rugged. Slice 1
+reshape updated to "expand firing-scenario coverage, then deepen" rather than "fix the heuristic
+first." Confirmed helpers: `topology_routing`, `autodidactic_loop`, `tuning_priors`,
+`hybrid_outer_refinement`. Still "no effect" under tested scenarios: `continuous_bandit`,
+`descriptor_mix_memory`, `hybrid_outer_acquisition`. `memory_override` shifts the rank
+distribution without moving the median.
