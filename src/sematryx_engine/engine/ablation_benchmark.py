@@ -9,20 +9,19 @@ runner replaces them with fresh tmp-rooted instances per cell so seeds and ablat
 not contaminate each other. The global ``random`` state is reseeded before each call
 since the Thompson-sampling bandit draws through it.
 
-**Methodology caveat — memory-dependent features.** Each cell starts with an empty
-memory store and a fresh bandit, which means the ``memory_override`` knob and (to a
-lesser extent) the ``descriptor_mix_memory`` knob cannot fire — they need
-``usage_count >= 3`` of prior runs in the same domain to trigger. The trade-off is
-deliberate (avoids cross-cell contamination from seed ordering) but it means those two
-knobs will read as ``no effect`` under the current default scenarios. A future
-methodology refinement should add a per-scenario warmup phase that seeds memory with N
-prior runs before measurement; until then, those two knobs are measured by their
-fallback behaviour, not their effect on cold-start runs.
+Scenarios with ``warmup_runs > 0`` run that many ``optimize(...)`` calls under
+``AblationConfig.default()`` before each measurement cell, snapshotting the resulting
+``strategy_memory.db`` + ``bandit_state.json``. Every knob cell at that (scenario, seed)
+copies the snapshot into a fresh isolation directory before measurement — cells stay
+independent (no seed-ordering or knob-ordering contamination), but history-dependent
+knobs (``memory_override``, ``descriptor_mix_memory``, ``continuous_bandit``) can fire.
+See ADR-0025.
 """
 
 from __future__ import annotations
 
 import random
+import shutil
 import statistics
 import tempfile
 import time
@@ -46,10 +45,19 @@ ALL_ON = "all_on"
 
 @dataclass(frozen=True, slots=True)
 class AblationScenario:
-    """One benchmark scenario. ``build_kwargs(seed)`` returns the kwargs for ``optimize``."""
+    """One benchmark scenario. ``build_kwargs(seed)`` returns the kwargs for ``optimize``.
+
+    ``warmup_runs`` (default 0) pre-populates `_MEMORY` and `_SELECTOR` with that many
+    `optimize(...)` calls under `AblationConfig.default()` before each measurement cell.
+    Set this > 0 for scenarios where history-dependent knobs (``memory_override``,
+    ``descriptor_mix_memory``, ``continuous_bandit``) need to fire. Leave at 0 for
+    scenarios that must be measured cold (e.g. topology-firing scenarios where memory
+    override would shadow the topology path). See ADR-0025.
+    """
 
     name: str
     build_kwargs: Callable[[int], dict[str, Any]]
+    warmup_runs: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -138,12 +146,50 @@ def _classify(delta_pct: float, p_value: float) -> str:
     return "no effect"
 
 
+def _build_warmup_snapshot(
+    scenario: AblationScenario,
+    seed: int,
+    snapshot_root: Path,
+) -> Path:
+    """Run scenario.warmup_runs into a snapshot dir; return the dir.
+
+    Warmup uses derived seeds (``seed * 1000 + w``) disjoint from measurement seed space
+    (1001-1100) and runs under ``AblationConfig.default()`` to populate memory + bandit.
+    The resulting ``strategy_memory.db`` and ``bandit_state.json`` are reused across every
+    knob cell at this (scenario, seed) via file copy (see ``_run_one``).
+    """
+    snapshot_root.mkdir(parents=True, exist_ok=True)
+    if scenario.warmup_runs <= 0:
+        return snapshot_root  # empty snapshot = current cold-cell behaviour
+    with _isolated_singletons(snapshot_root):
+        for w in range(scenario.warmup_runs):
+            warmup_seed = seed * 1000 + w
+            random.seed(warmup_seed)
+            kwargs = scenario.build_kwargs(warmup_seed)
+            kwargs["ablation"] = AblationConfig.default()
+            kwargs.setdefault("rng_seed", warmup_seed)
+            optimize(**kwargs)
+    return snapshot_root
+
+
+def _seed_isolation_from_snapshot(snapshot_root: Path, cell_root: Path) -> None:
+    """Copy warmup artefacts (``strategy_memory.db``, ``bandit_state.json``) from a
+    cached snapshot into a fresh per-cell isolation directory before measurement."""
+    cell_root.mkdir(parents=True, exist_ok=True)
+    for name in ("strategy_memory.db", "bandit_state.json"):
+        src = snapshot_root / name
+        if src.exists():
+            shutil.copy2(src, cell_root / name)
+
+
 def _run_one(
     scenario: AblationScenario,
     seed: int,
     config: AblationConfig,
+    snapshot_root: Path,
     isolation_root: Path,
 ) -> tuple[OptimizationResult, float]:
+    _seed_isolation_from_snapshot(snapshot_root, isolation_root)
     with _isolated_singletons(isolation_root):
         random.seed(seed)
         kwargs = scenario.build_kwargs(seed)
@@ -176,6 +222,16 @@ def run_ablation_matrix(
 
     cells: dict[tuple[str, str], CellResult] = {}
 
+    # Build all warmup snapshots up front (one per scenario × seed). Knob cells reuse them
+    # via copy so each cell still runs against an isolated, identical starting state.
+    snapshots: dict[tuple[str, int], Path] = {}
+    for scenario in scenarios:
+        for seed in seeds:
+            snapshot_root = root / "warmup_snapshots" / scenario.name / f"seed_{seed}"
+            snapshots[(scenario.name, seed)] = _build_warmup_snapshot(
+                scenario, seed, snapshot_root
+            )
+
     def collect(scenario_name: str, knob: str, seeds_used: list[int]) -> CellResult:
         finals: list[float] = []
         successes: list[bool] = []
@@ -183,10 +239,11 @@ def run_ablation_matrix(
         walls: list[float] = []
         strategies: list[str] = []
         config = _config_for(knob)
+        scenario = next(s for s in scenarios if s.name == scenario_name)
         for seed in seeds_used:
-            scenario = next(s for s in scenarios if s.name == scenario_name)
             cell_dir = root / scenario_name / knob / f"seed_{seed}"
-            result, wall = _run_one(scenario, seed, config, cell_dir)
+            snapshot_root = snapshots[(scenario_name, seed)]
+            result, wall = _run_one(scenario, seed, config, snapshot_root, cell_dir)
             finals.append(float(result.best_value))
             successes.append(bool(result.success))
             evals.append(int(result.evaluations))
@@ -280,7 +337,11 @@ def _knapsack_like(x: list[float]) -> float:
 
 
 def _hybrid_assignment(x: list[float]) -> float:
-    """Mixed discrete + continuous with cross-term — exercises the hybrid path."""
+    """Mixed discrete + continuous with cross-term — exercises the hybrid path.
+
+    Known to floor at median=1 in baseline `v1` (discrete shell search misses optimum
+    (disc=2, cat=1) by 1 consistently). `_hybrid_smooth` below is the separating version.
+    """
     disc = int(round(x[0]))  # integer
     cat = int(round(x[1]))   # categorical index
     cont = x[2:]
@@ -290,10 +351,38 @@ def _hybrid_assignment(x: list[float]) -> float:
     return base + discrete_penalty + cross
 
 
+def _hybrid_smooth(x: list[float]) -> float:
+    """4 integers ∈ [0,5] (1296 shells) + 2 continuous, smooth quadratic.
+
+    Designed so the discrete shell choice creates a gradient that LCB acquisition can
+    follow but uniform shell sampling cannot. The 4 integers give 6^4 = 1296 shells; an
+    outer budget of ~20 exploration steps visits a tiny fraction, so the visit allocation
+    strategy meaningfully affects outcomes.
+    """
+    target = (2, 3, 1, 4)
+    disc_cost = sum((int(round(x[i])) - target[i]) ** 2 for i in range(4))
+    cont_cost = sum(v * v for v in x[4:])
+    return disc_cost + cont_cost
+
+
 def default_scenarios() -> list[AblationScenario]:
-    """Four scenarios: smooth continuous, rugged-multimodal (topology-sensitive),
-    discrete-only, and mixed hybrid. Covers all three optimizer code paths plus a case
-    where topology routing should matter."""
+    """Scenarios sized so every ablation knob has at least one cell where it can fire.
+
+    Coverage map (see ADR-0025):
+
+    - ``sphere_smooth``: trivial continuous; reference for "feature doesn't matter".
+    - ``rugged_multimodal_8d``: warmed (``warmup_runs=5``) — exercises ``memory_override``,
+      ``continuous_bandit`` post-warmup; also where ``autodidactic_loop`` and
+      ``tuning_priors`` showed effect in baseline v1.
+    - ``discrete_knapsack``: warmed; discrete-bandit and discrete-memory test.
+    - ``hybrid_separating``: warmed; ``hybrid_outer_acquisition`` /
+      ``hybrid_outer_refinement`` / ``descriptor_mix_memory`` test target. Replaces the
+      floor-converging ``hybrid_mixed`` for these knobs.
+    - ``topology_firing_current``: cold (``warmup_runs=0``) by design — 13D + tight budget
+      pushes ``physarum_tunneling_score`` past 0.75 and topology override must fire ahead
+      of any warmed memory override.
+    - ``hybrid_mixed``: retained as legacy reference (floor-converging).
+    """
 
     def sphere_smooth_kwargs(_seed: int) -> dict[str, Any]:
         return {
@@ -336,11 +425,42 @@ def default_scenarios() -> list[AblationScenario]:
             "domain": "ablation_hybrid_mixed",
         }
 
+    def hybrid_separating_kwargs(_seed: int) -> dict[str, Any]:
+        return {
+            "objective_function": _hybrid_smooth,
+            "variable_descriptors": [
+                {"name": f"i{i}", "kind": "integer", "low": 0, "high": 5}
+                for i in range(4)
+            ] + [
+                {"name": "c1", "kind": "continuous", "low": -3.0, "high": 3.0},
+                {"name": "c2", "kind": "continuous", "low": -3.0, "high": 3.0},
+            ],
+            "max_evaluations": 600,
+            "domain": "ablation_hybrid_separating",
+        }
+
+    def topology_firing_current_kwargs(_seed: int) -> dict[str, Any]:
+        # 13D, max_evaluations=600 → budget_per_dimension=46.15 → tight regime
+        # → topology score = 0.45·1.0 + 0.35·1.0 + 0.20·0 = 0.80 → directive=aggressive
+        # → topology override fires under current heuristic. See ADR-0025.
+        return {
+            "objective_function": _rugged_multimodal,
+            "bounds": [(-5.0, 5.0)] * 13,
+            "max_evaluations": 600,
+            "domain": "ablation_topology_firing_current",
+        }
+
+    # warmup_runs=10 chosen so that Thompson sampling has enough updates to concentrate on
+    # the dominant strategy (memory_override fires at usage_count >= 3). With rugged objectives
+    # and reward variance, 5 warmup runs scatter picks across ~5 strategies; 10 reliably gets
+    # at least one strategy past the threshold on most seeds. See ADR-0025.
     return [
-        AblationScenario("sphere_smooth", sphere_smooth_kwargs),
-        AblationScenario("rugged_multimodal_8d", rugged_multimodal_kwargs),
-        AblationScenario("discrete_knapsack", discrete_knapsack_kwargs),
-        AblationScenario("hybrid_mixed", hybrid_mixed_kwargs),
+        AblationScenario("sphere_smooth", sphere_smooth_kwargs, warmup_runs=0),
+        AblationScenario("rugged_multimodal_8d", rugged_multimodal_kwargs, warmup_runs=10),
+        AblationScenario("discrete_knapsack", discrete_knapsack_kwargs, warmup_runs=10),
+        AblationScenario("hybrid_mixed", hybrid_mixed_kwargs, warmup_runs=0),
+        AblationScenario("hybrid_separating", hybrid_separating_kwargs, warmup_runs=10),
+        AblationScenario("topology_firing_current", topology_firing_current_kwargs, warmup_runs=0),
     ]
 
 

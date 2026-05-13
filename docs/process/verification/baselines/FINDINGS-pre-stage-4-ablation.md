@@ -1,131 +1,153 @@
 # Pre-Stage-4 ablation baseline — findings
 
-**Source data:** `ablation_pre-stage-4.json` / `ablation_pre-stage-4.md`
-**Methodology:** PRD-0025 / ADR-0024 (heavy matrix, N=100 seeds per cell, Mann-Whitney U with α=0.05).
-**Git rev:** `bc5a1a5` (PR 2 head; current `main` plus PRs #32 #33).
+**Current baseline (v2):** `ablation_pre-stage-4-v2.json` / `ablation_pre-stage-4-v2.md`
+**Historical (v1, no warmup, 4 scenarios):** `ablation_pre-stage-4.json` / `ablation_pre-stage-4.md`
+**Methodology:** PRD-0025 / ADR-0024 (verdict rule) + ADR-0025 (warmup + firing scenarios).
+**Heavy matrix:** N=100 seeds × 6 scenarios × 8 knobs, Mann-Whitney U with α=0.05.
+**Git rev (v2):** `1ecbcec`.
 
 ## TL;DR
 
-Across 4 scenarios × 8 ablation knobs × 100 seeds:
+The v2 baseline closes the "untested features" gap. Every knob now has a real verdict against
+at least one scenario where it can fire:
 
-| Feature | Scenario | Δ when off | p | Verdict |
+| Feature | Best scenario | Δ when off | p | Verdict |
 |---|---|---|---|---|
-| `autodidactic_loop` | `rugged_multimodal_8d` | **+100.24%** | <0.001 | **feature helps** |
-| `tuning_priors` | `rugged_multimodal_8d` | **+49.72%** | <0.001 | **feature helps** |
-| `topology_routing` | *every scenario* | 0% | 1.000 | **override never fires** (see below) |
-| (all other cells) | — | — | — | **no effect** (caveats below) |
+| `topology_routing` | `topology_firing_current` | **+71.19%** | <0.001 | **feature helps** |
+| `autodidactic_loop` | `rugged_multimodal_8d` | +48.11% | <0.001 | **feature helps** |
+| `tuning_priors` | `rugged_multimodal_8d` | +48.11% | <0.001 | **feature helps** |
+| `hybrid_outer_refinement` | `hybrid_separating` | (essential, see below) | <0.001 | **feature helps** |
+| `memory_override` | `rugged_multimodal_8d` (warmed) | 0% median, distributional | <0.001 | rank shift only |
+| `continuous_bandit` | (none) | 0% | ≥0.473 | **no effect** |
+| `descriptor_mix_memory` | (none) | 0% | 1.000 | **no effect** |
+| `hybrid_outer_acquisition` | (none) | 0% | ≥0.577 | **no effect** |
 
-Two features earn their complexity with statistically significant effects.
-`topology_routing` reads as "no effect" — but follow-up analysis shows the override **never fires
-on any tested scenario**, and the firing condition itself appears to have its budget term
-inverted. The other "no effect" verdicts have documented methodology caveats.
+**Four features confirmed helpful** (with statistically significant median shifts). **One**
+(`memory_override`) shifts the distribution without moving the median — a true secondary finding.
+**Three** (`continuous_bandit`, `descriptor_mix_memory`, `hybrid_outer_acquisition`) show no
+detectable effect even when their firing conditions are present.
 
-## `topology_routing` — what the data actually says
+## Headline reversal vs v1: topology routing helps, not hurts
 
-The harness reports zero effect because flipping the `topology_routing` knob changes literally
-nothing in the run. Strategy distributions are byte-identical across the on/off cells:
-
-```
-all_on (rugged_multimodal_8d):                  {'scipy_local_lbfgsb': 21, 'scipy_de': 79}
-topology_routing=OFF (rugged_multimodal_8d):    {'scipy_local_lbfgsb': 21, 'scipy_de': 79}
-```
-
-The reason: the override's firing gate (`_topology_tunneling_override` in
-[strategy_selector.py:35-48](src/sematryx_engine/engine/strategy_selector.py#L35-L48)) requires
-`tunneling_directive == "aggressive"` or `physarum_tunneling_score >= 0.75`. None of our four
-scenarios cross either threshold:
-
-| Scenario | dims | budget/dim | regime | complexity | score | directive | fires? |
-|---|---:|---:|---|---|---:|---|:---:|
-| `sphere_smooth` | 4 | 50.0 | moderate | medium | 0.560 | balanced | ❌ |
-| `rugged_multimodal_8d` | 8 | 50.0 | moderate | medium | 0.560 | balanced | ❌ |
-| `discrete_knapsack` | 5 | 50.0 | moderate | medium | 0.560 | balanced | ❌ |
-| `hybrid_mixed` | 5 | 64.0 | moderate | medium | 0.693 | balanced | ❌ |
-
-**So the correct reading is "we have no data on whether topology routing helps, because the
-gate never opens under any tested scenario,"** not "topology routing doesn't help."
-
-### Suspected design defect: the budget term may be inverted
-
-The score formula in [topology.py:64-71](src/sematryx_engine/engine/topology.py#L64-L71) is:
+The v1 findings doc recorded that `topology_routing` showed zero effect across all scenarios and
+hypothesised that the underlying `budget_factor` heuristic was sign-inverted (tight budgets
+should not trigger aggressive global search). **The v2 firing-scenario data refutes that
+hypothesis on the scenario tested:**
 
 ```
-score = 0.45 * complexity_factor + 0.35 * budget_factor + 0.20 * span_variability
-budget_factor: tight=1.0, moderate=0.7, generous=0.4
+topology_firing_current (13D rugged, budget=600, budget/dim=46.15 → tight regime):
+  all_on (override fires):           100/100 picks scipy_dual_annealing  → median 0.951
+  topology_routing=OFF (bandit):     33 dual_annealing, 38 shgo, 29 de   → median 1.628
+                                                                            Δ +71%, p<0.001
 ```
 
-This routes "aggressive" tunneling (forces `scipy_dual_annealing`, a global optimizer) toward
-**tight-budget** problems. The implicit reasoning is presumably "tight budget on a hard problem
-is high-stakes, so make the most exploratory bet."
+`scipy_dual_annealing` (forced by the override) beats the bandit's natural mix on 13D tight-budget
+rugged problems. The current `budget_factor: tight=1.0` mapping appears correct on at least this
+scenario.
 
-That reasoning is suspect. `scipy_dual_annealing` has explicit exploration (annealing) and
-exploitation (local refinement) phases; both need budget. On a tight budget, dual_annealing can
-exhaust evaluations exploring without converging — local methods with a reasonable start, or
-single-restart `lbfgsb`/`powell`, extract more value per evaluation. The "excess budget →
-afford exploration" framing reverses the budget term:
+**Slice 1 reshape:** the heuristic-flip task is withdrawn. Slice 1 instead **expands topology
+coverage** — adds firing scenarios at other (`complexity`, `budget_regime`) combinations and
+measures whether the override helps, hurts, or is no-op on each. The space of (dimensions ×
+budget × landscape) is large; v2 only tests one firing point.
 
-```
-budget_factor (hypothesized fix): tight=0.4, moderate=0.7, generous=1.0
-```
+## Per-feature interpretation
 
-Same range, signs flipped. The complexity and span_variability terms stay as-is.
+### `topology_routing` — confirmed helper on tested firing scenario
 
-ADR-0006 documents the contract of the override but does not argue for the current budget
-mapping; this is a heuristic that landed without a documented justification, and the data so
-far does not support it.
+Strategy distributions show the override pinning every seed to `scipy_dual_annealing`, vs the
+bandit splitting picks across three globals when free. The forced pick wins by 71%. Worth noting:
+the bandit picks `scipy_dual_annealing` itself on 33/100 free seeds, so the override only changes
+the routing on 67/100 cells — the magnitude implies dual_annealing is meaningfully better than
+shgo/de on this specific landscape.
+
+### `autodidactic_loop` and `tuning_priors` — confirmed helpers
+
+Δ dropped from +100% (v1) to +48% (v2) because warmup populates the bandit with high-quality
+priors, narrowing the gap that autodidactic and priors close. The verdict is unchanged.
+
+### `hybrid_outer_refinement` — essential on hybrid_separating
+
+Baseline median = `2.46e-32` (numerical zero — the refinement loop reliably finds the optimum).
+With refinement disabled, median = `4` (consistently misses the optimum by one discrete step in
+multiple dims). The reported Δ% is an artefact of dividing by a near-zero baseline; the meaningful
+statement is **"the hybrid solver does not find the optimum without the refinement loop."**
+
+### `memory_override` — distributional shift without median shift
+
+Same medians (`0.4713`) on both on/off, but Mann-Whitney p<0.001. The strategy distributions
+explain it:
+- On: 62 scipy_de + 38 scipy_local_lbfgsb
+- Off: 88 scipy_de + 12 scipy_local_lbfgsb
+
+Both `scipy_de` and `scipy_local_lbfgsb` happen to reach the same value on the rugged
+multimodal landscape from warm starts, so the median doesn't move; but the override's deterministic
+pick of `scipy_de` shifts which seeds land at what value. The verdict reads `no effect` because the
+rule keys off median direction; the rank-test signal is real but not actionable here.
+
+Followup: the verdict rule could grow a fourth category (`distributional only` or similar) for
+features that shift ranks without medians. Deferred — adding categories now without more examples
+risks overfitting the rule to one finding.
+
+### `continuous_bandit` — no detectable effect under warmup
+
+Even with the bandit warmed for 10 runs, uniform random over the candidate filter produces
+indistinguishable outcomes. Implication: the candidate filter (by complexity / dimensions in
+`strategy_selector.py:90-96`) is doing most of the work; the bandit's relative ranking among the
+remaining candidates barely matters on the tested scenarios.
+
+Followup: try a scenario where the filter returns a larger candidate set (low-dimensional
+mixed-complexity problems), so the bandit has more arms to discriminate.
+
+### `descriptor_mix_memory` and `hybrid_outer_acquisition` — no effect on tested scenarios
+
+The descriptor_mix filter requires mixed-history memory rows; warmup populates them but the
+resulting recommendations don't differ from domain-only rankings in any way that changes the
+hybrid inner solver's pick. LCB acquisition exploration likewise doesn't separate from uniform
+shell sampling — the **refinement** loop is doing the heavy lifting in the hybrid path.
+
+Followup: a hybrid scenario where the *exploration* phase matters (very tight inner budgets,
+forcing the outer to commit early) might separate LCB from random. Deferred.
+
+## What changed from v1 to v2
+
+- **Knobs measurable**: 2 → 5 (3 more given real signal; 3 still "no effect" but now under
+  conditions where they could fire).
+- **Scenarios**: 4 → 6 (`topology_firing_current` and `hybrid_separating` added; `hybrid_mixed`
+  retained as legacy reference).
+- **Methodology**: cold-state-per-cell → per-(scenario, seed) warmup snapshots cached across knob
+  cells (ADR-0025).
+- **Runtime**: heavy matrix ~5 min → ~15 min.
+- **Major hypothesis reversal**: the budget-factor-inversion hypothesis from v1's findings is
+  **withdrawn**. The current heuristic correctly routes on the tested firing scenario.
 
 ## Implications for Stage 4 Slice 1
 
-The original Slice 1 was "deepen Physarum tunneling beyond scaffolding." Based on this baseline,
-the slice should be reshaped to **fix the heuristic, prove the fix, then deepen what works**:
+The original Slice 1 ("deepen Physarum tunneling beyond scaffolding") and the v1 reshape
+("scenario design before flipping the heuristic") both need adjustment. The v2 data supports:
 
-1. **Add a scenario that triggers the override under the *current* (suspected-inverted) heuristic**
-   — e.g. 13D rugged problem with `budget_per_dimension < 50`. Measure whether
-   `scipy_dual_annealing` actually wins there. Predicted: it loses to `scipy_de` or even local
-   methods because dual_annealing cannot converge in the given budget.
-2. **Add a scenario that *would* trigger under the *inverted* heuristic** — e.g. moderate-to-high
-   complexity with generous budget per dimension. Measure whether dual_annealing wins. Predicted:
-   it wins.
-3. If those predictions hold, **flip the `budget_factor` mapping** in `topology.py` (recorded as
-   an ADR-0006 successor), re-run the baseline, and verify `topology_routing` now produces a
-   real "feature helps" verdict on at least one scenario.
-4. Only then deepen the topology integration (richer signals, more directives, etc.). Until
-   step 3, every deepening change is optimizing against zero data.
+1. **The current topology heuristic is not wrong on every firing scenario.** It works on the
+   single firing point we tested. Before deepening or modifying it, **measure more firing points**
+   — different (complexity, budget) combinations, different landscape types — and see whether the
+   verdict generalises.
+2. **`hybrid_outer_refinement` is load-bearing.** Slice 1 should not casually change this — it's
+   the difference between finding the optimum and missing by 4 on `hybrid_separating`.
+3. **`hybrid_outer_acquisition` (LCB exploration) is dispensable on tested scenarios.** Worth
+   measuring whether it has a regime where it matters; if not, it could be simplified or removed.
+4. **`memory_override`'s distributional effect** deserves a separate scenario where memory and
+   bandit pick genuinely different strategies (synthetic warm-up). That's a methodology slice
+   sibling to topology coverage.
 
-`make ablation` is the regression gate for each step.
+## Caveats
 
-The `autodidactic_loop` and `tuning_priors` confirmations mean Slice 1 work that interacts with
-those features can be measured against the current baseline immediately.
-
-## Caveats on the other "no effect" verdicts
-
-1. **`memory_override` / `descriptor_mix_memory`:** Each cell starts with an empty memory store
-   (deliberate, to avoid cross-cell contamination from seed ordering). Memory override needs
-   `usage_count >= 3` in domain to fire, so these knobs are measured by their fallback behaviour,
-   not their effect on cold-start runs. Followup tracked in `INTEGRATION_DEBT.md`: add an
-   optional per-scenario warmup phase.
-2. **`hybrid_outer_acquisition` / `hybrid_outer_refinement`:** The `hybrid_mixed` scenario
-   collapses to median=1 for every configuration — the discrete shell search consistently misses
-   the optimum (disc=2, cat=1) by 1 given the budget. Scenario doesn't separate the hybrid path.
-   Either grow the budget or redesign the objective to expose differences. Slice-2 scenario-design item.
-3. **`continuous_bandit`:** With a cold bandit (0 prior reward updates), Thompson draws from
-   `Beta(1, 1)` ≡ uniform random in expectation. The "no effect" here is structurally expected;
-   measuring the bandit requires pre-training, which is the same warmup gap as the memory knobs.
-4. **Single-machine, single-run baseline.** Effect sizes for the two "feature helps" verdicts
-   are large enough that hardware drift is unlikely to flip those verdicts, but follow-up runs
-   on different hardware are not yet collected.
-
-## What this baseline becomes
-
-- Reference point for every Stage 4 slice close: the per-feature, per-scenario medians and
-  p-values are the "before" data any future slice must beat for the features it touches.
-- Source of the Slice 1 scope reshape recorded above.
-- Input to the next methodology iteration (warmup-phase scenarios for memory- and
-  bandit-dependent knobs).
-
-## Next steps
-
-- Land PRs #32 and #33 first, then this PR.
-- Open Slice 1 with the reshape above: heuristic fix first, deepening after.
-- Track warmup-phase methodology refinement as a sibling slice (or absorb into Slice 1 if it
-  blocks topology measurement on hybrid/memory cases).
+1. **Single-machine, single-run baseline.** Effect sizes are large enough that hardware drift is
+   unlikely to flip the four "feature helps" verdicts, but follow-up runs on different hardware
+   are not yet collected.
+2. **Δ% near zero baselines is misleading.** The `hybrid_outer_refinement` row shows a
+   nonsensical large percentage because the baseline median is ~1e-32; the real statement is
+   "feature is essential." A future report-generator change could replace Δ% with absolute Δ when
+   the baseline is below a configurable threshold.
+3. **"No effect" verdicts apply to the tested scenarios only.** Three knobs still need more
+   targeted scenarios before we can confidently say they don't add value in general.
+4. **Discrete and `hybrid_mixed` scenarios floor at the optimum/floor for every config.** They
+   contribute no separation signal and could be retired from the default suite — kept for now
+   as legacy reference.
