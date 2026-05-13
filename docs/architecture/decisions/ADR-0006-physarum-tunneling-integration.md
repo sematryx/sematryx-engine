@@ -2,7 +2,14 @@
 
 ## Status
 
-Accepted
+**Superseded by ADR-0026** (2026-05-13). This ADR's "Physarum integration" claim is
+withdrawn — no Physarum machinery was implemented; the override only routes by
+problem-shape signals (dimensions + budget + bound variability) and hardcodes
+`scipy_dual_annealing`. The override's wiring is preserved under its honest name
+(`_shape_routing_override`). The real Physarum → tunneling integration is Stage 4
+Slice 1; see ADR-0026.
+
+Originally: Accepted
 
 ## Context
 

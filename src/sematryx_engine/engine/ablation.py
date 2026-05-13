@@ -18,7 +18,7 @@ class AblationConfig:
     must produce identical results for the same seeded inputs.
     """
 
-    topology_routing: bool = True
+    shape_routing: bool = True
     tuning_priors: bool = True
     autodidactic_loop: bool = True
     memory_override: bool = True
@@ -36,7 +36,7 @@ class AblationConfig:
     def all_off(cls) -> "AblationConfig":
         """All features off. Useful as a sanity reference, not a production path."""
         return cls(
-            topology_routing=False,
+            shape_routing=False,
             tuning_priors=False,
             autodidactic_loop=False,
             memory_override=False,

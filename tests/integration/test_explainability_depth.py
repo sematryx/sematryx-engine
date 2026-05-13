@@ -5,7 +5,7 @@ def sphere(x: list[float]) -> float:
     return sum(v * v for v in x)
 
 
-def test_explanation_adaptation_surface_links_topology_retries_and_winner() -> None:
+def test_explanation_adaptation_surface_links_shape_retries_and_winner() -> None:
     result = optimize(
         objective_function=sphere,
         bounds=[(-4.0, 4.0)] * 5,
@@ -17,8 +17,8 @@ def test_explanation_adaptation_surface_links_topology_retries_and_winner() -> N
     adaptation = expl["adaptation"]
     assert isinstance(adaptation, dict)
 
-    assert adaptation["topology_budget_regime"] in {"tight", "moderate", "generous"}
-    assert adaptation["topology_complexity_hint"] in {"low", "medium", "high"}
+    assert adaptation["budget_regime"] in {"tight", "moderate", "generous"}
+    assert adaptation["complexity_hint"] in {"low", "medium", "high"}
     assert adaptation["problem_complexity"] in {"low", "medium", "high"}
     assert isinstance(adaptation["problem_dimensions"], int)
     assert adaptation["problem_dimensions"] == 5

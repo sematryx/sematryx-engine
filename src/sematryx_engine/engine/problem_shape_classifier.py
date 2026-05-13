@@ -1,8 +1,28 @@
+"""Problem-shape classifier.
+
+Computes a deterministic classification of a problem from its **bounds** and
+**evaluation budget** alone — dimension count, bound-width statistics, and
+budget-per-dimension. The output drives routing decisions in the strategy selector.
+
+Important: this is **not** topology in the mathematical sense. The function never
+samples the objective; it cannot characterise the landscape, basins, ruggedness, or
+connectivity. The real topology pipeline (Physarum mapping → topology-informed
+tunneling) is a separate slice (see ADR-0026); this classifier is a lightweight
+routing prior, not a substitute for landscape analysis.
+"""
+
 from dataclasses import dataclass
 
 
 @dataclass(frozen=True, slots=True)
-class TopologyArtifact:
+class ProblemShape:
+    """Deterministic problem-shape classification.
+
+    Carries dimension, bound-width statistics, derived budget regime and
+    complexity hint, and a single score + directive used by the selector's
+    routing override. None of these signals come from the objective function.
+    """
+
     version: int
     dimensions: int
     min_span: float
@@ -10,8 +30,8 @@ class TopologyArtifact:
     avg_span: float
     budget_regime: str
     complexity_hint: str
-    physarum_tunneling_score: float
-    tunneling_directive: str
+    shape_routing_score: float
+    shape_routing_directive: str
 
     def as_dict(self) -> dict[str, object]:
         return {
@@ -22,16 +42,16 @@ class TopologyArtifact:
             "avg_span": self.avg_span,
             "budget_regime": self.budget_regime,
             "complexity_hint": self.complexity_hint,
-            "physarum_tunneling_score": self.physarum_tunneling_score,
-            "tunneling_directive": self.tunneling_directive,
+            "shape_routing_score": self.shape_routing_score,
+            "shape_routing_directive": self.shape_routing_directive,
         }
 
 
-def build_topology_artifact(
+def build_problem_shape(
     *,
     bounds: list[tuple[float, float]],
     max_evaluations: int,
-) -> TopologyArtifact:
+) -> ProblemShape:
     spans = [float(upper - lower) for lower, upper in bounds]
     dimensions = len(spans)
     avg_span = sum(spans) / float(dimensions) if dimensions else 0.0
@@ -70,13 +90,13 @@ def build_topology_artifact(
 
     score = min(1.0, max(0.0, 0.45 * complexity_factor + 0.35 * budget_factor + 0.20 * span_variability))
     if score >= 0.75:
-        tunneling_directive = "aggressive"
+        shape_routing_directive = "aggressive"
     elif score >= 0.5:
-        tunneling_directive = "balanced"
+        shape_routing_directive = "balanced"
     else:
-        tunneling_directive = "local"
+        shape_routing_directive = "local"
 
-    return TopologyArtifact(
+    return ProblemShape(
         version=2,
         dimensions=dimensions,
         min_span=min_span,
@@ -84,6 +104,6 @@ def build_topology_artifact(
         avg_span=avg_span,
         budget_regime=budget_regime,
         complexity_hint=complexity_hint,
-        physarum_tunneling_score=round(score, 6),
-        tunneling_directive=tunneling_directive,
+        shape_routing_score=round(score, 6),
+        shape_routing_directive=shape_routing_directive,
     )

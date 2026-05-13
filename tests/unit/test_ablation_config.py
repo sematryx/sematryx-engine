@@ -15,7 +15,7 @@ from sematryx_engine.engine.problem_features import extract_problem_features
 def test_default_config_is_all_on() -> None:
     cfg = AblationConfig.default()
     assert cfg.is_default()
-    assert cfg.topology_routing
+    assert cfg.shape_routing
     assert cfg.tuning_priors
     assert cfg.autodidactic_loop
     assert cfg.memory_override
@@ -34,7 +34,7 @@ def test_all_off_config_disables_every_knob() -> None:
 
 def test_knob_names_cover_every_field() -> None:
     expected = {
-        "topology_routing",
+        "shape_routing",
         "tuning_priors",
         "autodidactic_loop",
         "memory_override",
@@ -47,10 +47,10 @@ def test_knob_names_cover_every_field() -> None:
 
 
 def test_with_off_disables_only_named_knob() -> None:
-    cfg = AblationConfig.default().with_off("topology_routing")
-    assert cfg.topology_routing is False
+    cfg = AblationConfig.default().with_off("shape_routing")
+    assert cfg.shape_routing is False
     # Every other knob remains on.
-    for knob in KNOB_NAMES - {"topology_routing"}:
+    for knob in KNOB_NAMES - {"shape_routing"}:
         assert getattr(cfg, knob) is True, knob
 
 
@@ -66,14 +66,14 @@ def test_coerce_none_returns_default() -> None:
 
 
 def test_coerce_passes_through_existing_config() -> None:
-    cfg = AblationConfig(topology_routing=False)
+    cfg = AblationConfig(shape_routing=False)
     assert coerce(cfg) is cfg
 
 
 def test_config_is_frozen() -> None:
     cfg = AblationConfig.default()
     with pytest.raises(Exception):
-        cfg.topology_routing = False  # type: ignore[misc]
+        cfg.shape_routing = False  # type: ignore[misc]
 
 
 def test_neutral_priors_have_pinned_schema() -> None:
@@ -95,8 +95,8 @@ def test_neutral_priors_share_keys_with_computed_priors() -> None:
             bounds=[(-1.0, 1.0), (-2.0, 2.0)],
             max_evaluations=200,
         ),
-        topology_budget_regime="moderate",
-        tunneling_directive="balanced",
+        budget_regime="moderate",
+        shape_routing_directive="balanced",
         domain="general",
     )
     neutral = neutral_tuning_priors()

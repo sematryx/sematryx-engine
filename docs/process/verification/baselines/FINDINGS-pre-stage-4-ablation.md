@@ -1,10 +1,22 @@
 # Pre-Stage-4 ablation baseline — findings
 
+> **Note on terminology (2026-05-13, ADR-0026):** The baseline JSON/Markdown artefacts
+> below were produced *before* the topology→shape rename. They use the old field names
+> (`topology_routing`, `physarum_tunneling_score`, `tunneling_directive`,
+> `topology_firing_current`). In current code these are `shape_routing`,
+> `shape_routing_score`, `shape_routing_directive`, `shape_routing_firing_current`.
+> The verdicts in this doc are valid but **narrower than their original framing**:
+> "topology_routing helps" should be read as "**shape_routing helps**" — the override
+> measured here gates strategy choice on problem-space shape (dimensions, budget,
+> bound widths), not on any objective-landscape topology. The real topology pipeline
+> (Physarum mapping + topology-informed tunneling) is Stage 4 Slice 1; baselines after
+> that ships will use the corrected names.
+
 **Current baseline (v2):** `ablation_pre-stage-4-v2.json` / `ablation_pre-stage-4-v2.md`
 **Historical (v1, no warmup, 4 scenarios):** `ablation_pre-stage-4.json` / `ablation_pre-stage-4.md`
 **Methodology:** PRD-0025 / ADR-0024 (verdict rule) + ADR-0025 (warmup + firing scenarios).
 **Heavy matrix:** N=100 seeds × 6 scenarios × 8 knobs, Mann-Whitney U with α=0.05.
-**Git rev (v2):** `1ecbcec`.
+**Git rev (v2):** `1ecbcec` (pre-rename).
 
 ## TL;DR
 

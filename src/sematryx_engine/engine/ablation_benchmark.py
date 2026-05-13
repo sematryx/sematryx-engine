@@ -51,8 +51,8 @@ class AblationScenario:
     `optimize(...)` calls under `AblationConfig.default()` before each measurement cell.
     Set this > 0 for scenarios where history-dependent knobs (``memory_override``,
     ``descriptor_mix_memory``, ``continuous_bandit``) need to fire. Leave at 0 for
-    scenarios that must be measured cold (e.g. topology-firing scenarios where memory
-    override would shadow the topology path). See ADR-0025.
+    scenarios that must be measured cold (e.g. shape-routing-firing scenarios where memory
+    override would shadow the routing override). See ADR-0025.
     """
 
     name: str
@@ -378,9 +378,9 @@ def default_scenarios() -> list[AblationScenario]:
     - ``hybrid_separating``: warmed; ``hybrid_outer_acquisition`` /
       ``hybrid_outer_refinement`` / ``descriptor_mix_memory`` test target. Replaces the
       floor-converging ``hybrid_mixed`` for these knobs.
-    - ``topology_firing_current``: cold (``warmup_runs=0``) by design — 13D + tight budget
-      pushes ``physarum_tunneling_score`` past 0.75 and topology override must fire ahead
-      of any warmed memory override.
+    - ``shape_routing_firing_current``: cold (``warmup_runs=0``) by design — 13D + tight
+      budget pushes ``shape_routing_score`` past 0.75 and the shape-routing override must
+      fire ahead of any warmed memory override.
     - ``hybrid_mixed``: retained as legacy reference (floor-converging).
     """
 
@@ -439,15 +439,15 @@ def default_scenarios() -> list[AblationScenario]:
             "domain": "ablation_hybrid_separating",
         }
 
-    def topology_firing_current_kwargs(_seed: int) -> dict[str, Any]:
+    def shape_routing_firing_current_kwargs(_seed: int) -> dict[str, Any]:
         # 13D, max_evaluations=600 → budget_per_dimension=46.15 → tight regime
-        # → topology score = 0.45·1.0 + 0.35·1.0 + 0.20·0 = 0.80 → directive=aggressive
-        # → topology override fires under current heuristic. See ADR-0025.
+        # → shape_routing_score = 0.45·1.0 + 0.35·1.0 + 0.20·0 = 0.80 → directive=aggressive
+        # → shape-routing override fires under current heuristic. See ADR-0025, ADR-0026.
         return {
             "objective_function": _rugged_multimodal,
             "bounds": [(-5.0, 5.0)] * 13,
             "max_evaluations": 600,
-            "domain": "ablation_topology_firing_current",
+            "domain": "ablation_shape_routing_firing_current",
         }
 
     # warmup_runs=10 chosen so that Thompson sampling has enough updates to concentrate on
@@ -460,7 +460,7 @@ def default_scenarios() -> list[AblationScenario]:
         AblationScenario("discrete_knapsack", discrete_knapsack_kwargs, warmup_runs=10),
         AblationScenario("hybrid_mixed", hybrid_mixed_kwargs, warmup_runs=0),
         AblationScenario("hybrid_separating", hybrid_separating_kwargs, warmup_runs=10),
-        AblationScenario("topology_firing_current", topology_firing_current_kwargs, warmup_runs=0),
+        AblationScenario("shape_routing_firing_current", shape_routing_firing_current_kwargs, warmup_runs=0),
     ]
 
 

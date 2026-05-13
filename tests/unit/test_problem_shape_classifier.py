@@ -1,8 +1,8 @@
-from sematryx_engine.engine.topology import build_topology_artifact
+from sematryx_engine.engine.problem_shape_classifier import build_problem_shape
 
 
-def test_build_topology_artifact_schema() -> None:
-    artifact = build_topology_artifact(
+def test_build_problem_shape_schema() -> None:
+    artifact = build_problem_shape(
         bounds=[(-5.0, 5.0), (-2.0, 2.0), (0.0, 1.0)],
         max_evaluations=150,
     )
@@ -15,5 +15,5 @@ def test_build_topology_artifact_schema() -> None:
     assert payload["avg_span"] == 5.0
     assert payload["budget_regime"] == "moderate"
     assert payload["complexity_hint"] == "medium"
-    assert isinstance(payload["physarum_tunneling_score"], float)
-    assert payload["tunneling_directive"] in {"local", "balanced", "aggressive"}
+    assert isinstance(payload["shape_routing_score"], float)
+    assert payload["shape_routing_directive"] in {"local", "balanced", "aggressive"}

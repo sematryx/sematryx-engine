@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-05-13
+
+- **ADR-0026 / PR 5 — rename topology stub to problem-shape classifier; record drift; reshape Slice 1.**
+  Audit found that PRD-0006 / ADR-0005 (topology pipeline scaffold) shipped a problem-shape
+  classifier (89 lines: dims + budget + bound widths → weighted sum) under topology naming,
+  and that PRD-0007 / ADR-0006 ("Physarum tunneling integration") never implemented any
+  Physarum machinery — it wired a hardcoded `scipy_dual_annealing` override to the shape
+  classifier's output via metaphor. Mechanical rename across 30 files:
+  `engine/topology.py` → `engine/problem_shape_classifier.py`; `TopologyArtifact` →
+  `ProblemShape`; `physarum_tunneling_score` → `shape_routing_score`; `tunneling_directive` →
+  `shape_routing_directive`; `OptimizationResult.topology_artifact` →
+  `OptimizationResult.problem_shape`; `AblationConfig.topology_routing` → `shape_routing`;
+  `_topology_tunneling_override` → `_shape_routing_override`; basis
+  `"physarum_tunneling_override"` → `"shape_routing_override"`; scenario
+  `topology_firing_current` → `shape_routing_firing_current`; explanation keys updated
+  (`shape_routing_directive`, `shape_routing_score`, `budget_regime`, `complexity_hint`).
+  `tuning_priors` parameter `tunneling_directive` → `shape_routing_directive`;
+  `topology_budget_regime` → `budget_regime`. ADR-0005, ADR-0006, PRD-0006, PRD-0007
+  marked superseded. ACTIVE_PLAN Slice 1 reshaped from "deepen Physarum tunneling
+  beyond scaffolding" to **"port the real topology pipeline from the legacy api
+  reference"** — Sobol decomposition + `PhysarumNetworkMapper` +
+  `TopologyInformedTunneling` + `SHGOSubspaceProver`, under ablation gating, each
+  piece independently measured. README and SYSTEM_OVERVIEW updated. Findings doc
+  prepended with a relabel note so the v2 baseline's "topology_routing helps"
+  verdict reads as "shape_routing helps" — same data, narrower claim.
+
 ## 2026-05-11
 
 - Stage 3 optional closure: hybrid outer **LCB acquisition** over discrete shells (explore + refine), tightened inner budget splits; **descriptor_mix-scoped** SQLite recommendations (`json_extract`) with hybrid inner wiring; updated hybrid result message. PRD-0024 / VR-0024 / ADR-0023.

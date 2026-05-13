@@ -12,7 +12,7 @@ def test_result_model_fields() -> None:
     assert result.strategy_used == "test"
 
 
-def test_result_model_topology_optional_field() -> None:
+def test_result_model_problem_shape_optional_field() -> None:
     plain = OptimizationResult(
         best_solution=[0.0],
         best_value=1.0,
@@ -20,16 +20,16 @@ def test_result_model_topology_optional_field() -> None:
         strategy_used="plain",
         success=True,
     )
-    with_topology = OptimizationResult(
+    with_shape = OptimizationResult(
         best_solution=[0.0],
         best_value=1.0,
         evaluations=2,
         strategy_used="plain",
         success=True,
-        topology_artifact={"version": 1, "dimensions": 1},
+        problem_shape={"version": 1, "dimensions": 1},
     )
-    assert plain.topology_artifact is None
-    assert with_topology.topology_artifact is not None
+    assert plain.problem_shape is None
+    assert with_shape.problem_shape is not None
 
 
 def test_result_model_explanation_optional_field() -> None:

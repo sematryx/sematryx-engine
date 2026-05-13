@@ -25,14 +25,14 @@ def test_core_depth_validation_snapshot_and_runtime_contract(tmp_path: Path) -> 
     assert result.success is True
     assert result.strategy_used in STRATEGIES
 
-    topo = result.topology_artifact
-    assert topo is not None
-    assert topo["version"] == 2
-    assert topo["tunneling_directive"] in {"local", "balanced", "aggressive"}
+    shape = result.problem_shape
+    assert shape is not None
+    assert shape["version"] == 2
+    assert shape["shape_routing_directive"] in {"local", "balanced", "aggressive"}
 
     expl = result.explanation
     assert expl is not None
-    assert expl["selection_basis"] in {"bandit", "memory_override", "physarum_tunneling_override"}
+    assert expl["selection_basis"] in {"bandit", "memory_override", "shape_routing_override"}
     assert isinstance(expl["tuning_priors"], dict)
 
     attempts = expl["attempts"]

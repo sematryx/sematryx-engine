@@ -34,17 +34,24 @@ def memory_override_confidence(usage_count: int) -> float:
     return round(min(0.95, 0.72 + 0.06 * float(usage_count)), 10)
 
 
-def _topology_tunneling_override(
-    topology_artifact: dict[str, object] | None,
+def _shape_routing_override(
+    problem_shape: dict[str, object] | None,
 ) -> tuple[str, float] | None:
-    if not isinstance(topology_artifact, dict):
+    """Hardcoded routing override fired when the problem-shape classifier's score
+    crosses 0.75 or its directive is ``aggressive``. Forces ``scipy_dual_annealing``.
+
+    This is the legacy stub: it routes based on a problem-shape classifier, not on any
+    landscape-topology analysis. See ADR-0026 for why the original Physarum→tunneling
+    intent never landed and is now the substance of Stage 4 Slice 1.
+    """
+    if not isinstance(problem_shape, dict):
         return None
-    raw_score = topology_artifact.get("physarum_tunneling_score", 0.0)
+    raw_score = problem_shape.get("shape_routing_score", 0.0)
     if isinstance(raw_score, (int, float)):
         score = float(raw_score)
     else:
         score = 0.0
-    directive = str(topology_artifact.get("tunneling_directive", ""))
+    directive = str(problem_shape.get("shape_routing_directive", ""))
     if directive == "aggressive" or score >= 0.75:
         return "scipy_dual_annealing", 0.86
     return None
@@ -63,7 +70,7 @@ class StrategySelector:
         self,
         features: ProblemFeatures,
         domain: str,
-        topology_artifact: dict[str, object] | None = None,
+        problem_shape: dict[str, object] | None = None,
         deterministic_bandit: bool = False,
         *,
         memory_descriptor_mix: str | None = None,
@@ -72,7 +79,7 @@ class StrategySelector:
         strategy, confidence, _basis = self.select_with_basis(
             features=features,
             domain=domain,
-            topology_artifact=topology_artifact,
+            problem_shape=problem_shape,
             deterministic_bandit=deterministic_bandit,
             memory_descriptor_mix=memory_descriptor_mix,
             ablation=ablation,
@@ -84,7 +91,7 @@ class StrategySelector:
         *,
         features: ProblemFeatures,
         domain: str,
-        topology_artifact: dict[str, object] | None = None,
+        problem_shape: dict[str, object] | None = None,
         deterministic_bandit: bool = False,
         exclude_strategies: frozenset[str] | None = None,
         memory_descriptor_mix: str | None = None,
@@ -116,12 +123,12 @@ class StrategySelector:
         else:
             recommendations = []
 
-        if ab.topology_routing:
-            tunneling_choice = _topology_tunneling_override(topology_artifact)
-            if tunneling_choice is not None:
-                strategy, confidence = tunneling_choice
+        if ab.shape_routing:
+            routing_choice = _shape_routing_override(problem_shape)
+            if routing_choice is not None:
+                strategy, confidence = routing_choice
                 if strategy not in excluded:
-                    return strategy, confidence, "physarum_tunneling_override"
+                    return strategy, confidence, "shape_routing_override"
 
         for rec in recommendations:
             if (
